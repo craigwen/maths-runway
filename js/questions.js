@@ -245,7 +245,7 @@
         return finish({
           format: 'mc',
           choiceFrom: [x, y],
-          text: 'Which number is <b>bigger</b>?',
+          text: 'Which number is <b>bigger</b>, ' + num(x) + ' or ' + num(y) + '?',
           speak: 'Which number is bigger, ' + x + ' or ' + y + '?',
           answer: ans, _ansNum: ans, label: 'bigger of ' + x + ', ' + y,
           hint: 'Look at the tens digits first.',
@@ -338,7 +338,7 @@
         return finish({
           format: 'mc',
           choiceFrom: [x, y],
-          text: 'Which number is <b>bigger</b>?',
+          text: 'Which number is <b>bigger</b>, ' + num(x) + ' or ' + num(y) + '?',
           speak: 'Which number is bigger, ' + x + ' or ' + y + '?',
           answer: ans, _ansNum: ans, label: 'bigger of ' + x + ', ' + y,
           hint: 'Compare the hundreds first.',
