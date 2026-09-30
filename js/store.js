@@ -172,6 +172,26 @@
       var p = this.profile();
       if (p.landmarks.indexOf(id) === -1) { p.landmarks.push(id); this.saveProfile(p); return true; }
       return false;
+    },
+
+    /* Lady Catherine's wardrobe. unlocked: dress ids owned; selected: dress id worn.
+       Rhea starts with the two plainest dresses; each landmark earns two more. */
+    wardrobe: function () { return this.get('wardrobe', { unlocked: [1, 2], selected: 1 }); },
+    saveWardrobe: function (w) { this.set('wardrobe', w); },
+
+    unlockDresses: function (ids) {
+      var w = this.wardrobe(), added = [];
+      ids.forEach(function (id) {
+        if (w.unlocked.indexOf(id) === -1) { w.unlocked.push(id); added.push(id); }
+      });
+      if (added.length) this.saveWardrobe(w);
+      return added;
+    },
+
+    selectDress: function (id) {
+      var w = this.wardrobe();
+      if (w.unlocked.indexOf(id) !== -1) { w.selected = id; this.saveWardrobe(w); return true; }
+      return false;
     }
   };
 

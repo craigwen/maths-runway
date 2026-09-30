@@ -28,9 +28,10 @@
   <img class="bg-lady" src="art/lady-garden-v3.svg" alt="" aria-hidden="true">
 
   <div class="guide">
-    <img class="guide-img" src="art/lady-guide-v3.svg" alt="Lady Catherine, your Tudor guide, in a long green gown">
+    <img class="guide-img" id="guide-img" src="art/lady-dress-1.svg" alt="Lady Catherine, your Tudor guide, wearing her Russet Kirtle">
     <div class="speech" id="guide-speech">Well met, traveller! Choose your quest.</div>
   </div>
+  <button id="wardrobe-btn" class="wardrobe-btn" aria-label="Open Lady Catherine's wardrobe">👗 Wardrobe</button>
 
   <div class="rose-rule" aria-hidden="true"><span>🌹</span></div>
 
@@ -98,6 +99,17 @@
     <div id="complete-badges"></div>
     <button id="complete-home" class="cta">Back to the map</button>
   </div>
+</section>
+
+<!-- ============ WARDROBE ============ -->
+<section id="screen-wardrobe" class="screen" aria-label="Lady Catherine's wardrobe">
+  <header class="topbar">
+    <button id="wardrobe-back" class="icon-btn" aria-label="Back">←</button>
+    <div class="brand">Catherine's Wardrobe</div>
+    <div style="width:56px"></div>
+  </header>
+  <p class="tagline">Each landmark earns two new gowns. Tap one for Lady Catherine to wear.</p>
+  <div class="wardrobe" id="wardrobe-grid"></div>
 </section>
 
 <!-- ============ PARENT DASHBOARD ============ -->

@@ -19,6 +19,28 @@
       how: 'Finish 5 sessions' }
   ];
 
+  /* Lady Catherine's wardrobe. Simplest gowns first; each landmark earns two more. */
+  var DRESSES = [
+    { id: 1, name: 'Russet Kirtle', desc: 'Plain undyed wool, linen chemise', landmark: null, art: 'art/lady-dress-1.svg' },
+    { id: 2, name: 'Grey Wool Kirtle', desc: 'Undyed grey wool, leather girdle', landmark: null, art: 'art/lady-dress-2.svg' },
+    { id: 3, name: 'Embroidered Kirtle', desc: 'Madder-red wool, blackwork neckline, apron', landmark: 'dover', art: 'art/lady-dress-3.svg' },
+    { id: 4, name: 'Fur-Trimmed Gown', desc: 'Dark green wool, fur cuffs, brass girdle', landmark: 'dover', art: 'art/lady-dress-4.svg' },
+    { id: 5, name: 'Damask Gown', desc: 'Tawny silk damask, gold caul', landmark: 'tower', art: 'art/lady-dress-5.svg' },
+    { id: 6, name: 'Velvet Court Gown', desc: 'Deep blue velvet, gold aglets, jeweled girdle', landmark: 'tower', art: 'art/lady-dress-6.svg' },
+    { id: 7, name: 'Cloth of Silver', desc: 'Silver tissue gown, pearl edging', landmark: 'hampton', art: 'art/lady-dress-7.svg' },
+    { id: 8, name: 'Cloth of Gold', desc: 'Gold brocade state gown, ermine trim', landmark: 'hampton', art: 'art/lady-dress-8.svg' }
+  ];
+  var DRESS_BY_LANDMARK = { dover: [3, 4], tower: [5, 6], hampton: [7, 8] };
+
+  function dressById(id) {
+    for (var i = 0; i < DRESSES.length; i++) if (DRESSES[i].id === id) return DRESSES[i];
+    return DRESSES[0];
+  }
+  function landmarkName(id) {
+    for (var i = 0; i < LANDMARKS.length; i++) if (LANDMARKS[i].id === id) return LANDMARKS[i].name;
+    return '';
+  }
+
   var BADGES = [
     { id: 'first-session', emoji: '🚀', name: 'First Quest', desc: 'Finished a practice session' },
     { id: 'sharpshooter', emoji: '🎯', name: 'Super Solver', desc: '10 correct in one session' },
@@ -77,12 +99,22 @@
   }
 
   /* ---------------- home ---------------- */
+  function updateGuidePortrait() {
+    var dress = dressById(Store.wardrobe().selected);
+    var gi = $('guide-img');
+    if (gi) {
+      gi.src = dress.art;
+      gi.alt = 'Lady Catherine, your Tudor guide, wearing her ' + dress.name;
+    }
+  }
+
   function renderHome() {
     var p = Store.profile();
     var topics = Store.topics();
     $('points-val').textContent = p.points;
     $('streak-val').textContent = p.streak;
     guideGreeting();
+    updateGuidePortrait();
     ['bonds', 'placevalue'].forEach(function (t) {
       $('level-' + t).textContent = 'Level ' + topics[t].level;
       $('secure-' + t).hidden = !Store.topicSecure(t);
@@ -112,6 +144,37 @@
 
   function updateMuteBtn() {
     $('mute-btn').textContent = muted ? '🔇' : '🔊';
+  }
+
+  /* ---------------- wardrobe ---------------- */
+  function renderWardrobe() {
+    var w = Store.wardrobe();
+    var html = '';
+    DRESSES.forEach(function (d) {
+      var owned = w.unlocked.indexOf(d.id) !== -1;
+      var sel = w.selected === d.id;
+      html += '<button class="dress-card' + (owned ? '' : ' locked') + (sel ? ' selected' : '') + '"' +
+        ' data-dress="' + d.id + '"' + (owned ? '' : ' disabled') + '>' +
+        '<img class="dress-img" src="' + d.art + '" alt="' + d.name + '">' +
+        '<div class="dress-name">' + d.name + '</div>' +
+        '<div class="dress-desc">' + d.desc + '</div>' +
+        (owned ? (sel ? '<div class="dress-worn">Wearing ✓</div>' : '<div class="dress-worn pick">Tap to wear</div>')
+               : '<div class="dress-lock">🔒 ' + landmarkName(d.landmark) + '</div>') +
+        '</button>';
+    });
+    $('wardrobe-grid').innerHTML = html;
+    var cards = $('wardrobe-grid').querySelectorAll('.dress-card:not(.locked)');
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].addEventListener('click', function () {
+        var id = parseInt(this.getAttribute('data-dress'), 10);
+        if (Store.selectDress(id)) { renderWardrobe(); updateGuidePortrait(); }
+      });
+    }
+  }
+
+  function awardDresses(landmarkId, earned) {
+    var added = Store.unlockDresses(DRESS_BY_LANDMARK[landmarkId] || []);
+    if (added.length) earned.push('👗 ' + added.length + ' new gowns for Lady Catherine! See the Wardrobe.');
   }
 
   /* ---------------- session ---------------- */
@@ -319,9 +382,15 @@
 
   function checkUnlocks(earned) {
     var p = Store.profile();
-    if (Store.topicSecure('bonds') && Store.unlockLandmark('dover')) earned.push('🏯 Dover Castle unlocked!');
-    if (Store.topicSecure('placevalue') && Store.unlockLandmark('tower')) earned.push('👑 Tower of London unlocked!');
-    if (p.sessionsCompleted >= 5 && Store.unlockLandmark('hampton')) earned.push('🌳 Hampton Court unlocked!');
+    if (Store.topicSecure('bonds') && Store.unlockLandmark('dover')) {
+      earned.push('🏯 Dover Castle unlocked!'); awardDresses('dover', earned);
+    }
+    if (Store.topicSecure('placevalue') && Store.unlockLandmark('tower')) {
+      earned.push('👑 Tower of London unlocked!'); awardDresses('tower', earned);
+    }
+    if (p.sessionsCompleted >= 5 && Store.unlockLandmark('hampton')) {
+      earned.push('🌳 Hampton Court unlocked!'); awardDresses('hampton', earned);
+    }
     if (Store.awardBadge('first-session')) earned.push('🚀 Badge: First Quest');
     if (S.correctFirst >= 10 && Store.awardBadge('sharpshooter')) earned.push('🎯 Badge: Super Solver');
     if (Store.topicSecure('bonds') && Store.awardBadge('bond-builder')) earned.push('🧮 Badge: Bond Builder');
@@ -412,8 +481,21 @@
 
   /* ---------------- wiring ---------------- */
   document.addEventListener('DOMContentLoaded', function () {
+    /* Grant dresses for landmarks completed before the wardrobe existed. */
+    Store.profile().landmarks.forEach(function (lm) {
+      Store.unlockDresses(DRESS_BY_LANDMARK[lm] || []);
+    });
     renderHome();
     bindParentGate();
+
+    $('wardrobe-btn').addEventListener('click', function () {
+      renderWardrobe();
+      show('screen-wardrobe');
+    });
+    $('wardrobe-back').addEventListener('click', function () {
+      renderHome();
+      show('screen-home');
+    });
 
     $('topic-bonds').addEventListener('click', function () { startSession('bonds'); });
     $('topic-placevalue').addEventListener('click', function () { startSession('placevalue'); });
