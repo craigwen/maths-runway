@@ -152,6 +152,7 @@
     var q = currentQ();
     S.wrongs = 0;
     S.locked = false;
+    S.mcChoice = null;
     $('q-tag').textContent = TOPIC_NAMES[q.topic];
     $('question').innerHTML = q.text;
     $('feedback').className = 'feedback';
@@ -167,9 +168,16 @@
         var b = document.createElement('button');
         b.className = 'mc-btn';
         b.textContent = c;
-        b.addEventListener('click', function () { answerMc(b, c); });
+        b.addEventListener('click', function () { selectMc(b, c); });
         wrap.appendChild(b);
       });
+      var sub = document.createElement('button');
+      sub.className = 'cta mc-submit';
+      sub.id = 'mc-submit';
+      sub.textContent = 'Check ✓';
+      sub.disabled = true;
+      sub.addEventListener('click', submitMc);
+      wrap.appendChild(sub);
       area.appendChild(wrap);
     } else {
       var w = document.createElement('div');
@@ -199,9 +207,24 @@
     else if (d.textContent.length < 4) { d.textContent += k; }
   }
 
-  function answerMc(btn, choice) {
-    if (S.locked) return;
-    checkAnswer(choice, btn);
+  /* Multiple choice: 1) child selects an answer, 2) taps Check,
+     3) the app marks it. Tapping another choice changes the selection. */
+  function selectMc(btn, choice) {
+    if (S.locked || btn.disabled) return;
+    S.mcChoice = { btn: btn, value: choice };
+    $('answer-area').querySelectorAll('.mc-btn').forEach(function (b) {
+      b.classList.remove('selected');
+    });
+    btn.classList.add('selected');
+    $('mc-submit').disabled = false;
+  }
+
+  function submitMc() {
+    if (S.locked || !S.mcChoice) return;
+    var c = S.mcChoice;
+    S.mcChoice = null;
+    $('mc-submit').disabled = true;
+    checkAnswer(c.value, c.btn);
   }
 
   function norm(s) { return String(s).replace(/^0+/, '') || '0'; }
@@ -229,16 +252,20 @@
     Store.recordFact(q.id, firstTry);
     window.MRW.applyResult(Store, q.topic, firstTry);
     showFeedback('good', praise() + ' +' + pts);
-    speak(praise());
   }
 
   function onWrong(btn) {
     var q = currentQ();
     S.wrongs += 1;
-    if (btn) btn.classList.add('picked-wrong');
+    if (btn) {
+      /* A wrong multiple-choice pick is marked and retired so the
+         retry is a fresh choice, not a re-tap of the same answer. */
+      btn.classList.add('picked-wrong');
+      btn.classList.remove('selected');
+      btn.disabled = true;
+    }
     if (S.wrongs === 1) {
       showFeedback('kind', tryAgain() + '<span class="hint">' + q.hint + '</span>');
-      speak(tryAgain() + ' ' + q.hint);
     } else {
       /* Second wrong: reveal kindly and move on. Never a fail state. */
       lockInputs();
@@ -246,7 +273,6 @@
       window.MRW.applyResult(Store, q.topic, false);
       queueRequeue(q);
       showFeedback('kind', 'Good try. ' + q.reveal);
-      speak('Good try. ' + q.reveal);
     }
   }
 
@@ -316,7 +342,6 @@
     $('complete-badges').innerHTML = earned.map(function (e) {
       return '<div class="new-badge">' + e + '</div>';
     }).join('');
-    speak('Session complete! You earned ' + S.points + ' points.');
     show('screen-complete');
     S = null;
   }

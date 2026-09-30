@@ -1,5 +1,5 @@
 /* Maths Runway service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-runway-v3';
+var CACHE = 'maths-runway-v4';
 var FILES = [
   './',
   './index.html',

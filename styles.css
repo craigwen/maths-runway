@@ -139,7 +139,10 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
 .mc-btn:active { transform: scale(0.97); }
 .mc-btn.picked-right { background: var(--good-bg); border-color: var(--good); }
 .mc-btn.picked-wrong { background: var(--kind-bg); border-color: var(--kind); }
+.mc-btn.selected { border-color: var(--gold); background: var(--gold-bg); }
 .mc-btn:disabled { opacity: 1; }
+.mc-submit { margin-top: 14px; }
+.mc-submit:disabled { opacity: 0.45; }
 
 .pad-wrap { margin-top: 8px; }
 .pad-display {
