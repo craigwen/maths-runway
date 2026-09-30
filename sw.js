@@ -1,5 +1,5 @@
 /* Maths Runway service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-runway-v5';
+var CACHE = 'maths-runway-v6';
 var FILES = [
   './',
   './index.html',
@@ -12,9 +12,9 @@ var FILES = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
-  './art/lady-guide-v2.jpg',
-  './art/lady-court-v2.jpg',
-  './art/lady-garden-v2.jpg'
+  './art/lady-guide-v3.svg',
+  './art/lady-court-v3.svg',
+  './art/lady-garden-v3.svg'
 ];
 
 self.addEventListener('install', function (event) {
