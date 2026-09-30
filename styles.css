@@ -20,11 +20,18 @@
 
 html, body {
   margin: 0; padding: 0;
-  background: var(--bg); color: var(--ink);
+  color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 18px; line-height: 1.45;
   touch-action: manipulation;
   min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 480px at 50% -140px, #fff9e8 0%, rgba(255,249,232,0) 62%),
+    radial-gradient(900px 700px at 110% 110%, #f7ecd4 0%, rgba(247,236,212,0) 55%),
+    var(--bg);
 }
 
 .screen { display: none; max-width: 640px; margin: 0 auto; padding: 12px 16px 48px; }
@@ -34,9 +41,13 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
 
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 0; min-height: 56px;
+  padding: 10px 16px; min-height: 60px;
+  margin: 0 -16px 4px;
+  background: linear-gradient(180deg, #243354 0%, #1f2a44 100%);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 0 0 var(--radius) var(--radius);
 }
-.brand { font-size: 24px; font-weight: 800; }
+.brand { font-size: 24px; font-weight: 800; color: #fdf6e9; letter-spacing: 0.5px; }
 .tagline { color: var(--ink-soft); margin: 0 0 6px; font-size: 16px; }
 
 .pills { display: flex; gap: 8px; }
@@ -187,3 +198,49 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
 .dash-row .pct { font-weight: 800; }
 .work-item { font-size: 16px; }
 .work-item .pct { color: var(--kind); font-weight: 800; }
+
+/* ---------- Tudor art ---------- */
+.screen { position: relative; }
+.screen.active { z-index: 1; }
+
+.bg-lady {
+  position: fixed; right: -24px; bottom: 0;
+  width: min(46vw, 280px); height: auto;
+  opacity: 0.16; pointer-events: none; z-index: 0;
+  -webkit-mask-image: linear-gradient(to top, black 52%, transparent 96%);
+  mask-image: linear-gradient(to top, black 52%, transparent 96%);
+}
+
+.guide { display: flex; gap: 12px; align-items: center; margin: 12px 0 4px; }
+.guide-img {
+  width: 104px; height: 148px; object-fit: cover; object-position: top center;
+  border-radius: 60px 60px 16px 16px;
+  border: 3px solid var(--gold); background: var(--gold-bg); flex: none;
+}
+.speech {
+  position: relative; background: var(--card); border: 2px solid var(--line);
+  border-radius: 16px; padding: 12px 14px; font-size: 17px; font-weight: 600;
+}
+.speech::before {
+  content: ""; position: absolute; left: -11px; top: 36px;
+  border: 8px solid transparent; border-right-color: var(--line); border-left: 0;
+}
+.speech::after {
+  content: ""; position: absolute; left: -7px; top: 38px;
+  border: 6px solid transparent; border-right-color: var(--card); border-left: 0;
+}
+
+.rose-rule {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 2px; color: var(--gold); font-size: 18px;
+}
+.rose-rule::before, .rose-rule::after {
+  content: ""; height: 2px; flex: 1;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.celebrate-img {
+  width: 168px; height: 216px; object-fit: cover; object-position: top center;
+  border-radius: 90px 90px 18px 18px; border: 4px solid var(--gold);
+  display: block; margin: 0 auto 10px; background: var(--gold-bg);
+}

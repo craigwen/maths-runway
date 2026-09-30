@@ -31,6 +31,18 @@
   var PRAISE = ['Well done!', 'Brilliant!', 'Super work!', 'You got it!', 'Amazing!'];
   var TRY_AGAIN = ['Not quite, try once more.', 'Nearly! Have another go.', 'Good try, one more time.'];
 
+  var GREETINGS = [
+    'Well met, traveller! Choose your quest.',
+    'Lady Catherine says: little and often wins the crown.',
+    'The court is counting on you. Shall we practise?',
+    'A new day, a new quest. Pick your challenge below.',
+    'Steady now. Ten minutes of sums makes a scholar.'
+  ];
+  function guideGreeting() {
+    var day = Math.floor(Date.now() / 86400000);
+    $('guide-speech').textContent = GREETINGS[day % GREETINGS.length];
+  }
+
   /* ---------------- helpers ---------------- */
   function $(id) { return document.getElementById(id); }
   function show(id) {
@@ -70,6 +82,7 @@
     var topics = Store.topics();
     $('points-val').textContent = p.points;
     $('streak-val').textContent = p.streak;
+    guideGreeting();
     ['bonds', 'placevalue'].forEach(function (t) {
       $('level-' + t).textContent = 'Level ' + topics[t].level;
       $('secure-' + t).hidden = !Store.topicSecure(t);
