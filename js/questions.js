@@ -267,12 +267,30 @@
     ],
     2: [
       function (rng, params) { /* what is the digit worth */
-        var n, useTens;
-        if (params) { n = params[0]; useTens = params[1] === 1; }
-        else {
-          var h = rng.int(1, 9), t = rng.int(1, 9), o = rng.int(0, 9);
-          n = h * 100 + t * 10 + o; useTens = rng.next() < 0.5;
+        function digitCount(num, d) {
+          var c = 0;
+          String(num).split('').forEach(function (ch) { if (Number(ch) === d) c += 1; });
+          return c;
         }
+        function fresh() {
+          /* The asked digit must appear exactly once in the number,
+             otherwise "what is the 6 worth?" in 662 has two answers. */
+          var h, t, o, n, useTens, d, guard = 0;
+          do {
+            h = rng.int(1, 9); t = rng.int(1, 9); o = rng.int(0, 9);
+            n = h * 100 + t * 10 + o; useTens = rng.next() < 0.5;
+            d = useTens ? t : h;
+            guard += 1;
+          } while (digitCount(n, d) > 1 && guard < 50);
+          return [n, useTens];
+        }
+        var n, useTens, ok = false;
+        if (params) {
+          n = params[0]; useTens = params[1] === 1;
+          var pd = useTens ? Math.floor((n % 100) / 10) : Math.floor(n / 100);
+          ok = digitCount(n, pd) === 1;
+        }
+        if (!ok) { var f = fresh(); n = f[0]; useTens = f[1]; }
         var d = useTens ? Math.floor((n % 100) / 10) : Math.floor(n / 100);
         var ans = useTens ? d * 10 : d * 100;
         var place = useTens ? 'tens' : 'hundreds';
