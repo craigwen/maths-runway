@@ -1,5 +1,5 @@
 /* Maths Runway service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-runway-v2';
+var CACHE = 'maths-runway-v3';
 var FILES = [
   './',
   './index.html',
@@ -39,8 +39,12 @@ self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then(function (hit) {
       return hit || fetch(event.request).then(function (res) {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (cache) { cache.put(event.request, copy); });
+        /* Only cache successful responses: never store a 404, or the
+           missing file haunts the app even after it exists. */
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (cache) { cache.put(event.request, copy); });
+        }
         return res;
       }).catch(function () {
         return caches.match('./index.html');
