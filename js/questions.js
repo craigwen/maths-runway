@@ -62,7 +62,14 @@
   function finish(q, topic, level, genIdx, params, rng, forceMc) {
     q.id = [topic, level, genIdx].concat(params).join('.');
     q.topic = topic; q.level = level;
-    if (mcOrPad(rng, forceMc) === 'mc' || q.format === 'mc') {
+    if (q.choiceFrom) {
+      /* Comparing questions: the buttons must be the numbers being
+         compared, never near-miss distractors (a distractor could be
+         larger than the right answer and make the app look wrong). */
+      q.format = 'mc';
+      q.choices = rng.shuffle(q.choiceFrom.slice()).map(String);
+      delete q.choiceFrom;
+    } else if (mcOrPad(rng, forceMc) === 'mc' || q.format === 'mc') {
       q.format = 'mc';
       var ds = distractors(q._ansNum, rng, 2);
       q.choices = rng.shuffle([q._ansNum].concat(ds)).map(String);
@@ -237,6 +244,7 @@
         var ans = Math.max(x, y);
         return finish({
           format: 'mc',
+          choiceFrom: [x, y],
           text: 'Which number is <b>bigger</b>?',
           speak: 'Which number is bigger, ' + x + ' or ' + y + '?',
           answer: ans, _ansNum: ans, label: 'bigger of ' + x + ', ' + y,
@@ -311,6 +319,7 @@
         var ans = Math.max(x, y);
         return finish({
           format: 'mc',
+          choiceFrom: [x, y],
           text: 'Which number is <b>bigger</b>?',
           speak: 'Which number is bigger, ' + x + ' or ' + y + '?',
           answer: ans, _ansNum: ans, label: 'bigger of ' + x + ', ' + y,
@@ -356,6 +365,7 @@
         var ans = which === 'smallest' ? sorted[0] : which === 'middle' ? sorted[1] : sorted[2];
         return finish({
           format: 'mc',
+          choiceFrom: [a, b, c],
           text: 'Which is the <b>' + which + '</b>?<br>' + [a, b, c].map(num).join(' &nbsp; '),
           speak: 'Which is the ' + which + ' of ' + a + ', ' + b + ' and ' + c + '?',
           answer: ans, _ansNum: ans, label: which + ' of 3 numbers',
