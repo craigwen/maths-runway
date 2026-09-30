@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Maths Runway</title>
+<meta name="description" content="A Tudor maths quest for Year 3 practice.">
+<meta name="theme-color" content="#1f2a44">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ HOME / JOURNEY MAP ============ -->
+<section id="screen-home" class="screen active" aria-label="Journey map">
+  <header class="topbar">
+    <div class="brand">Maths Runway</div>
+    <div class="pills">
+      <div class="pill" id="pill-points" title="Points">⭐ <span id="points-val">0</span></div>
+      <div class="pill" id="pill-streak" title="Day streak">🔥 <span id="streak-val">0</span></div>
+    </div>
+  </header>
+
+  <p class="tagline">A Tudor maths quest. Practise, earn stars, unlock castles.</p>
+
+  <h2>Choose your quest</h2>
+  <div class="topics">
+    <button class="topic-card" id="topic-bonds" aria-label="Start Number Bonds quest">
+      <div class="topic-emoji" aria-hidden="true">🧮</div>
+      <div class="topic-name">Number Bonds</div>
+      <div class="topic-sub">Making 10 and 20</div>
+      <div class="topic-level" id="level-bonds">Level 1</div>
+      <div class="secure-flag" id="secure-bonds" hidden>Secure ✓</div>
+    </button>
+    <button class="topic-card" id="topic-placevalue" aria-label="Start Place Value quest">
+      <div class="topic-emoji" aria-hidden="true">🏰</div>
+      <div class="topic-name">Place Value</div>
+      <div class="topic-sub">Numbers to 1000</div>
+      <div class="topic-level" id="level-placevalue">Level 1</div>
+      <div class="secure-flag" id="secure-placevalue" hidden>Secure ✓</div>
+    </button>
+  </div>
+
+  <h2>Landmarks</h2>
+  <div class="landmarks" id="landmarks"></div>
+
+  <h2>Badges</h2>
+  <div class="badges" id="badges"></div>
+
+  <button id="parent-btn" class="parent-btn" aria-label="Grown-ups area. Press and hold.">
+    Grown-ups: press and hold
+  </button>
+  <div class="hold-hint" id="hold-hint" hidden>Keep holding…</div>
+</section>
+
+<!-- ============ SESSION ============ -->
+<section id="screen-session" class="screen" aria-label="Practice session">
+  <header class="topbar">
+    <button id="quit-btn" class="icon-btn" aria-label="Quit session">✕</button>
+    <div class="progress" id="progress" aria-label="Session progress"></div>
+    <button id="mute-btn" class="icon-btn" aria-label="Turn sound on or off">🔊</button>
+  </header>
+
+  <div class="q-head">
+    <span class="q-tag" id="q-tag">Number Bonds</span>
+    <button id="speak-btn" class="icon-btn big" aria-label="Read the question aloud">🔈</button>
+  </div>
+
+  <div class="question" id="question" aria-live="polite"></div>
+
+  <div id="answer-area"></div>
+
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <button id="next-btn" class="cta" hidden>Next →</button>
+</section>
+
+<!-- ============ SESSION COMPLETE ============ -->
+<section id="screen-complete" class="screen" aria-label="Session complete">
+  <div class="complete-card">
+    <div class="complete-emoji" aria-hidden="true">🎉</div>
+    <h2>Session complete!</h2>
+    <p class="big-stat"><span id="complete-points">0</span> points earned</p>
+    <p><span id="complete-correct">0</span> out of <span id="complete-total">12</span> correct first try</p>
+    <div id="complete-badges"></div>
+    <button id="complete-home" class="cta">Back to the map</button>
+  </div>
+</section>
+
+<!-- ============ PARENT DASHBOARD ============ -->
+<section id="screen-dashboard" class="screen" aria-label="Parent dashboard">
+  <header class="topbar">
+    <button id="dash-back" class="icon-btn" aria-label="Back">←</button>
+    <div class="brand">Grown-ups</div>
+    <div style="width:56px"></div>
+  </header>
+  <div class="dash">
+    <p class="dash-note">Practice summary for Number Bonds and Place Value. Scores are for grown-ups, not grades for Rhea.</p>
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dash-num" id="d-sessions">0</div><div class="dash-label">Sessions completed</div></div>
+      <div class="dash-card"><div class="dash-num" id="d-time">0</div><div class="dash-label">Minutes practised</div></div>
+      <div class="dash-card"><div class="dash-num" id="d-streak">0</div><div class="dash-label">Day streak</div></div>
+      <div class="dash-card"><div class="dash-num" id="d-points">0</div><div class="dash-label">Total points</div></div>
+    </div>
+    <h2>Accuracy by topic</h2>
+    <div id="d-topics"></div>
+    <h2>Topics</h2>
+    <div id="d-secure"></div>
+    <h2>Facts needing work</h2>
+    <div id="d-work"></div>
+    <h2>What she should be able to do (Year 3)</h2>
+    <div class="dash-card">
+      <p><b>Number:</b> count in 4s, 8s, 50s, 100s; read, write and order numbers to 1000; add and subtract 3-digit numbers (column method); recall the 3, 4 and 8 times tables.</p>
+      <p><b>Later this year:</b> fractions, measures (length, mass, money, time), shape and statistics.</p>
+      <p class="dash-note">School focus right now is usually place value, then addition and subtraction (autumn term).</p>
+    </div>
+  </div>
+</section>
+
+<script src="js/store.js"></script>
+<script src="js/questions.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function (e) {
+        console.warn('Service worker registration failed:', e);
+      });
+    });
+  }
+</script>
+</body>
+</html>
