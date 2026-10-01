@@ -614,11 +614,20 @@
     }
     var rb = $('restore-btn');
     if (rb) rb.onclick = function () {
-      if (window.confirm('Replace this device\u2019s progress with Rhea\u2019s 1 Oct snapshot (8 sessions, 900 points)?')) {
+      if (!window.confirm('Replace this device\u2019s progress with Rhea\u2019s 1 Oct snapshot (8 sessions, 900 points)?')) return;
+      var msg;
+      try {
+        if (!window.MRW || !window.MRW.restoreRheaProgress) throw new Error('restore code not loaded');
         window.MRW.restoreRheaProgress();
-        renderDashboard();
-        renderHome();
+        var p = Store.profile();
+        msg = 'Restored: ' + p.sessionsCompleted + ' sessions, ' + p.points + ' points, ' +
+          p.landmarks.length + ' landmarks.';
+      } catch (e) {
+        msg = 'Restore failed: ' + (e && e.message ? e.message : String(e));
       }
+      window.alert(msg);
+      renderDashboard();
+      renderHome();
     };
   }
 
