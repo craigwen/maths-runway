@@ -123,6 +123,11 @@
       return this.topicAttempts(topic) >= 15 && (this.topicAccuracy(topic) || 0) >= 0.8;
     },
 
+    /* Mastery is sustained excellence: 40+ attempts at 90%+ accuracy. */
+    topicMastered: function (topic) {
+      return this.topicAttempts(topic) >= 40 && (this.topicAccuracy(topic) || 0) >= 0.9;
+    },
+
     secureFactIds: function (topic) {
       var facts = this.facts();
       var out = [];

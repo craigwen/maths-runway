@@ -75,12 +75,29 @@
     { id: 13, era: 'edwardian', name: 'Silk Evening Dress', desc: 'Pale blue silk, empire waistline', landmark: 'ritz', art: 'art/lady-dress-13.svg' },
     { id: 14, era: 'edwardian', name: 'Beaded Evening Gown', desc: 'Ivory, sparkling beadwork bodice', landmark: 'ritz', art: 'art/lady-dress-14.svg' },
     { id: 15, era: 'edwardian', name: 'Velvet Opera Coat', desc: 'Burgundy velvet over champagne silk', landmark: null, art: 'art/lady-dress-15.svg' },
-    { id: 16, era: 'edwardian', name: 'Court Presentation Gown', desc: 'White, long train, feather headdress', landmark: null, art: 'art/lady-dress-16.svg' }
+    { id: 16, era: 'edwardian', name: 'Court Presentation Gown', desc: 'White, long train, feather headdress', landmark: null, art: 'art/lady-dress-16.svg' },
+    { id: 17, era: 'tudor', name: 'Coronation Robe', desc: 'Crimson velvet, ermine, gold clasps', landmark: null, bonus: 'master-bonds', art: 'art/lady-dress-17.svg' },
+    { id: 18, era: 'tudor', name: 'Royal Purple Gown', desc: 'Purple silk damask, pearl edging', landmark: null, bonus: 'master-placevalue', art: 'art/lady-dress-18.svg' },
+    { id: 19, era: 'edwardian', name: 'Ascot Gown', desc: 'White, black ribbons, wide-brim hat', landmark: null, bonus: 'master-fractions', art: 'art/lady-dress-19.svg' },
+    { id: 20, era: 'edwardian', name: 'Peacock Evening Gown', desc: 'Iridescent teal silk, beadwork', landmark: null, bonus: 'master-measures', art: 'art/lady-dress-20.svg' }
   ];
   var DRESS_BY_LANDMARK = { dover: [3, 4], tower: [5, 6], hampton: [7, 8],
     towerbridge: [9, 10], buckingham: [11, 12], ritz: [13, 14] };
   /* Final dresses of an era: awarded once when the whole era is complete. */
   var DRESS_BY_ERA_BONUS = { edwardian: [15, 16] };
+  /* Bonus dresses for mastery badges. */
+  var DRESS_BY_MASTERY = {
+    'master-bonds': 17, 'master-placevalue': 18,
+    'master-fractions': 19, 'master-measures': 20
+  };
+  function dressUnlockHint(d) {
+    if (d.landmark) return landmarkName(d.landmark);
+    if (d.bonus) {
+      var m = MASTERY.filter(function (x) { return x.id === d.bonus; })[0];
+      return m ? 'Master ' + TOPIC_NAMES[m.topic] : '';
+    }
+    return 'Complete ' + eraById(d.era).name;
+  }
 
   function dressById(id) {
     for (var i = 0; i < DRESSES.length; i++) if (DRESSES[i].id === id) return DRESSES[i];
@@ -98,7 +115,19 @@
     { id: 'place-pro', emoji: '🏰', name: 'Place Value Pro', desc: 'Secured Place Value' },
     { id: 'hot-streak', emoji: '🔥', name: 'Hot Streak', desc: 'Practised 3 days in a row' },
     { id: 'explorer', emoji: '🗺️', name: 'Tudor Explorer', desc: 'Unlocked all 3 Tudor landmarks' },
-    { id: 'edwardian-explorer', emoji: '🚂', name: '1900s Explorer', desc: 'Completed 1900s London' }
+    { id: 'edwardian-explorer', emoji: '🚂', name: '1900s Explorer', desc: 'Completed 1900s London' },
+    { id: 'master-bonds', emoji: '🥇', name: 'Bonds Master', desc: 'Mastered Number Bonds' },
+    { id: 'master-placevalue', emoji: '🏆', name: 'Place Value Master', desc: 'Mastered Place Value' },
+    { id: 'master-fractions', emoji: '🎖️', name: 'Fractions Master', desc: 'Mastered Fractions' },
+    { id: 'master-measures', emoji: '🏅', name: 'Measures Master', desc: 'Mastered Measures' }
+  ];
+
+  /* Mastery badges: one per topic, for sustained 90%+ accuracy. */
+  var MASTERY = [
+    { topic: 'bonds', id: 'master-bonds', emoji: '🥇' },
+    { topic: 'placevalue', id: 'master-placevalue', emoji: '🏆' },
+    { topic: 'fractions', id: 'master-fractions', emoji: '🎖️' },
+    { topic: 'measures', id: 'master-measures', emoji: '🏅' }
   ];
 
   var PRAISE = ['Well done!', 'Brilliant!', 'Super work!', 'You got it!', 'Amazing!'];
@@ -165,7 +194,8 @@
           '<div class="topic-name">' + TOPIC_NAMES[t] + '</div>' +
           '<div class="topic-sub">' + meta.sub + '</div>' +
           '<div class="topic-level">Level ' + topics[t].level + '</div>' +
-          (Store.topicSecure(t) ? '<div class="secure-flag">Secure ✓</div>' : '') +
+          (Store.topicMastered(t) ? '<div class="secure-flag master-flag">Master ⭐</div>'
+            : Store.topicSecure(t) ? '<div class="secure-flag">Secure ✓</div>' : '') +
           '</button>';
       });
     });
@@ -221,11 +251,12 @@
         var sel = w.selected === d.id;
         html += '<button class="dress-card' + (owned ? '' : ' locked') + (sel ? ' selected' : '') + '"' +
           ' data-dress="' + d.id + '"' + (owned ? '' : ' disabled') + '>' +
-          '<img class="dress-img" src="' + d.art + '" alt="' + d.name + '">' +
+          (d.art ? '<img class="dress-img" src="' + d.art + '" alt="' + d.name + '">'
+                 : '<div class="dress-img dress-pending" aria-hidden="true">👗</div>') +
           '<div class="dress-name">' + d.name + '</div>' +
           '<div class="dress-desc">' + d.desc + '</div>' +
           (owned ? (sel ? '<div class="dress-worn">Wearing ✓</div>' : '<div class="dress-worn pick">Tap to wear</div>')
-                 : '<div class="dress-lock">🔒 ' + (d.landmark ? landmarkName(d.landmark) : 'Complete ' + era.name) + '</div>') +
+                 : '<div class="dress-lock">🔒 ' + dressUnlockHint(d) + '</div>') +
           '</button>';
       });
       html += '</div>';
@@ -481,6 +512,15 @@
       }
     });
     if (Store.awardBadge('first-session')) earned.push('🚀 Badge: First Quest');
+    MASTERY.forEach(function (m) {
+      if (Store.topicMastered(m.topic) && Store.awardBadge(m.id)) {
+        earned.push(m.emoji + ' Badge: ' + TOPIC_NAMES[m.topic] + ' Master');
+        var did = DRESS_BY_MASTERY[m.id];
+        if (did && Store.unlockDresses([did]).length) {
+          earned.push('👗 Bonus dress: ' + DRESSES[did - 1].name + '!');
+        }
+      }
+    });
     if (S.correctFirst >= 10 && Store.awardBadge('sharpshooter')) earned.push('🎯 Badge: Super Solver');
     if (Store.topicSecure('bonds') && Store.awardBadge('bond-builder')) earned.push('🧮 Badge: Bond Builder');
     if (Store.topicSecure('placevalue') && Store.awardBadge('place-pro')) earned.push('🏰 Badge: Place Value Pro');
@@ -546,11 +586,13 @@
     });
     $('d-topics').innerHTML = th;
 
-    var sec = [], prog = [];
+    var sec = [], prog = [], mst = [];
     window.MRW.TOPICS.forEach(function (t) {
+      if (Store.topicMastered(t)) mst.push(TOPIC_NAMES[t]);
       (Store.topicSecure(t) ? sec : prog).push(TOPIC_NAMES[t]);
     });
     $('d-secure').innerHTML =
+      '<div class="dash-row"><span>Master ⭐</span><span>' + (mst.join(', ') || '–') + '</span></div>' +
       '<div class="dash-row"><span>Secure</span><span>' + (sec.join(', ') || '–') + '</span></div>' +
       '<div class="dash-row"><span>In progress</span><span>' + (prog.join(', ') || '–') + '</span></div>';
 
