@@ -616,6 +616,18 @@
 
   /* ---------------- wiring ---------------- */
   document.addEventListener('DOMContentLoaded', function () {
+    /* One-time migration: the 'harrods' landmark was renamed to 'buckingham'.
+       Without this, a player who unlocked Harrods keeps the old id, sees
+       Buckingham locked forever, and can never complete the 1900s era. */
+    (function () {
+      var mp = Store.profile();
+      var hi = mp.landmarks.indexOf('harrods');
+      if (hi !== -1) {
+        mp.landmarks.splice(hi, 1);
+        if (mp.landmarks.indexOf('buckingham') === -1) mp.landmarks.push('buckingham');
+        Store.saveProfile(mp);
+      }
+    })();
     /* Grant dresses for landmarks completed before the wardrobe existed. */
     Store.profile().landmarks.forEach(function (lm) {
       Store.unlockDresses(DRESS_BY_LANDMARK[lm] || []);
