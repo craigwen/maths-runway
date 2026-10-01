@@ -1,4 +1,4 @@
-/* Maths Runway - UI wiring. Screens, session flow, rewards, parent gate. */
+/* Maths Masters - UI wiring. Screens, session flow, rewards, parent gate. */
 (function () {
   'use strict';
 

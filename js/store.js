@@ -1,4 +1,4 @@
-/* Maths Runway - persistence layer.
+/* Maths Masters - persistence layer.
    All keys namespaced "mrw.". Falls back to in-memory storage if
    localStorage is unavailable, so the app never crashes. */
 (function (global) {
