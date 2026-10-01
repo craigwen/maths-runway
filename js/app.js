@@ -75,7 +75,7 @@
     { id: 13, era: 'edwardian', name: 'Silk Evening Dress', desc: 'Pale blue silk, empire waistline', landmark: 'ritz', art: 'art/lady-dress-13.svg' },
     { id: 14, era: 'edwardian', name: 'Beaded Evening Gown', desc: 'Ivory, sparkling beadwork bodice', landmark: 'ritz', art: 'art/lady-dress-14.svg' },
     { id: 15, era: 'edwardian', name: 'Velvet Opera Coat', desc: 'Burgundy velvet over champagne silk', landmark: null, art: 'art/lady-dress-15.svg' },
-    { id: 16, era: 'edwardian', name: 'Court Presentation Gown', desc: 'White, long train, feather headdress', landmark: null, art: 'art/lady-dress-16.svg' },
+    { id: 16, era: 'edwardian', name: 'Court Presentation Gown', desc: 'White, long lace train', landmark: null, art: 'art/lady-dress-16.svg' },
     { id: 17, era: 'tudor', name: 'Coronation Robe', desc: 'Crimson velvet, ermine, gold clasps', landmark: null, bonus: 'master-bonds', art: 'art/lady-dress-17.svg' },
     { id: 18, era: 'tudor', name: 'Royal Purple Gown', desc: 'Purple silk damask, pearl edging', landmark: null, bonus: 'master-placevalue', art: 'art/lady-dress-18.svg' },
     { id: 19, era: 'edwardian', name: 'Ascot Gown', desc: 'White, black ribbons, wide-brim hat', landmark: null, bonus: 'master-fractions', art: 'art/lady-dress-19.svg' },
@@ -320,6 +320,7 @@
     $('feedback').className = 'feedback';
     $('feedback').innerHTML = '';
     $('next-btn').hidden = true;
+    $('next-btn').classList.remove('go');
     /* Clear last question's Check button; next-btn stays put in the footer. */
     var oldSub = $('mc-submit');
     if (oldSub) oldSub.remove();
@@ -415,6 +416,8 @@
     if (firstTry) S.correctFirst += 1;
     if (btn) btn.classList.add('picked-right');
     lockInputs();
+    /* Green Next: this one is correct, and it should not look like Check. */
+    $('next-btn').classList.add('go');
     Store.recordFact(q.id, firstTry);
     window.MRW.applyResult(Store, q.topic, firstTry);
     showFeedback('good', praise() + ' +' + pts);
