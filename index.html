@@ -57,7 +57,6 @@
   <header class="topbar">
     <button id="quit-btn" class="icon-btn" aria-label="Quit session">✕</button>
     <div class="progress" id="progress" aria-label="Session progress"></div>
-    <button id="mute-btn" class="icon-btn" aria-label="Turn sound on or off">🔊</button>
   </header>
 
   <div class="q-head">
@@ -70,7 +69,9 @@
   <div id="answer-area"></div>
 
   <div class="feedback" id="feedback" aria-live="polite"></div>
-  <button id="next-btn" class="cta" hidden>Next →</button>
+  <div class="q-actions" id="q-actions">
+    <button id="next-btn" class="cta" hidden>Next →</button>
+  </div>
 </section>
 
 <!-- ============ SESSION COMPLETE ============ -->

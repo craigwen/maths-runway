@@ -132,9 +132,7 @@
     return a;
   }
 
-  var muted = Store.get('muted', false);
   function speak(text) {
-    if (muted) return;
     try {
       var synth = window.speechSynthesis;
       if (!synth) return;
@@ -224,11 +222,6 @@
         '<span>' + b.emoji + '</span><span class="b-name">' + b.name + '</span></div>';
     });
     $('badges').innerHTML = bHtml;
-    updateMuteBtn();
-  }
-
-  function updateMuteBtn() {
-    $('mute-btn').textContent = muted ? '🔇' : '🔊';
   }
 
   /* ---------------- wardrobe ---------------- */
@@ -311,6 +304,9 @@
     $('feedback').className = 'feedback';
     $('feedback').innerHTML = '';
     $('next-btn').hidden = true;
+    /* Clear last question's Check button; next-btn stays put in the footer. */
+    var oldSub = $('mc-submit');
+    if (oldSub) oldSub.remove();
 
     var area = $('answer-area');
     area.innerHTML = '';
@@ -330,7 +326,8 @@
       sub.textContent = 'Check ✓';
       sub.disabled = true;
       sub.addEventListener('click', submitMc);
-      wrap.appendChild(sub);
+      /* The Check button lives in the sticky footer so it is always visible. */
+      $('q-actions').appendChild(sub);
       area.appendChild(wrap);
     } else {
       var w = document.createElement('div');
@@ -609,12 +606,6 @@
     $('next-btn').addEventListener('click', nextQuestion);
     $('speak-btn').addEventListener('click', function () {
       if (S) speak(currentQ().speak);
-    });
-    $('mute-btn').addEventListener('click', function () {
-      muted = !muted;
-      Store.set('muted', muted);
-      updateMuteBtn();
-      if (!muted && S) speak(currentQ().speak);
     });
     $('quit-btn').addEventListener('click', function () {
       try { window.speechSynthesis.cancel(); } catch (e) {}
