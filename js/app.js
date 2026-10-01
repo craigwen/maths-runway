@@ -8,29 +8,79 @@
 
   /* ---------------- config ---------------- */
   var LANDMARKS = [
-    { id: 'dover', emoji: '🏯', name: 'Dover Castle',
+    { id: 'dover', era: 'tudor', emoji: '🏯', name: 'Dover Castle',
       fact: 'Dover Castle has secret tunnels dug deep beneath the white cliffs.',
       how: 'Secure Number Bonds' },
-    { id: 'tower', emoji: '👑', name: 'Tower of London',
+    { id: 'tower', era: 'tudor', emoji: '👑', name: 'Tower of London',
       fact: 'The Tower of London is nearly 1,000 years old, and its ravens are said to guard the kingdom.',
       how: 'Secure Place Value' },
-    { id: 'hampton', emoji: '🌳', name: 'Hampton Court',
+    { id: 'hampton', era: 'tudor', emoji: '🌳', name: 'Hampton Court',
       fact: "Hampton Court was Henry VIII's favourite palace, with a famous maze in its gardens.",
-      how: 'Finish 5 sessions' }
+      how: 'Finish 5 sessions' },
+    { id: 'towerbridge', era: 'edwardian', emoji: '🌉', name: 'Tower Bridge',
+      fact: 'Tower Bridge opened in 1894. Its road lifts up to let tall ships pass beneath.',
+      how: 'Secure Fractions' },
+    { id: 'harrods', era: 'edwardian', emoji: '🛍️', name: 'Harrods',
+      fact: 'Harrods opened its famous Knightsbridge store in 1905.',
+      how: 'Secure Measures' },
+    { id: 'ritz', era: 'edwardian', emoji: '🎩', name: 'The Ritz',
+      fact: 'The Ritz opened in 1906 and became the fanciest hotel in London.',
+      how: 'Finish 10 sessions' }
   ];
+
+  /* Eras: each is a chapter with its own quests, landmarks and dresses.
+     An era unlocks when the previous era is complete (all its landmarks). */
+  var ERAS = [
+    { id: 'tudor', name: 'Tudor England', topics: ['bonds', 'placevalue'],
+      landmarkIds: ['dover', 'tower', 'hampton'], dressIds: [1, 2, 3, 4, 5, 6, 7, 8] },
+    { id: 'edwardian', name: '1900s London', topics: ['fractions', 'measures'],
+      landmarkIds: ['towerbridge', 'harrods', 'ritz'], dressIds: [9, 10, 11, 12, 13, 14, 15, 16],
+      requires: 'tudor' }
+  ];
+
+  var TOPIC_META = {
+    bonds: { emoji: '🧮', sub: 'Making 10 and 20' },
+    placevalue: { emoji: '🏰', sub: 'Numbers to 1000' },
+    fractions: { emoji: '🍕', sub: 'Halves, quarters, thirds' },
+    measures: { emoji: '📏', sub: 'Length, mass, money, time' }
+  };
+
+  function eraById(id) {
+    for (var i = 0; i < ERAS.length; i++) if (ERAS[i].id === id) return ERAS[i];
+    return ERAS[0];
+  }
+  function eraComplete(era) {
+    var p = Store.profile();
+    return era.landmarkIds.every(function (id) { return p.landmarks.indexOf(id) !== -1; });
+  }
+  function eraUnlocked(era) {
+    if (!era.requires) return true;
+    return eraComplete(eraById(era.requires));
+  }
 
   /* Lady Catherine's wardrobe. Simplest gowns first; each landmark earns two more. */
   var DRESSES = [
-    { id: 1, name: 'Russet Kirtle', desc: 'Plain undyed wool, linen chemise', landmark: null, art: 'art/lady-dress-1.svg' },
-    { id: 2, name: 'Grey Wool Kirtle', desc: 'Undyed grey wool, leather girdle', landmark: null, art: 'art/lady-dress-2.svg' },
-    { id: 3, name: 'Embroidered Kirtle', desc: 'Madder-red wool, blackwork neckline, apron', landmark: 'dover', art: 'art/lady-dress-3.svg' },
-    { id: 4, name: 'Fur-Trimmed Gown', desc: 'Dark green wool, fur cuffs, brass girdle', landmark: 'dover', art: 'art/lady-dress-4.svg' },
-    { id: 5, name: 'Damask Gown', desc: 'Tawny silk damask, gold caul', landmark: 'tower', art: 'art/lady-dress-5.svg' },
-    { id: 6, name: 'Velvet Court Gown', desc: 'Deep blue velvet, gold aglets, jeweled girdle', landmark: 'tower', art: 'art/lady-dress-6.svg' },
-    { id: 7, name: 'Cloth of Silver', desc: 'Silver tissue gown, pearl edging', landmark: 'hampton', art: 'art/lady-dress-7.svg' },
-    { id: 8, name: 'Cloth of Gold', desc: 'Gold brocade state gown, ermine trim', landmark: 'hampton', art: 'art/lady-dress-8.svg' }
+    { id: 1, era: 'tudor', name: 'Russet Kirtle', desc: 'Plain undyed wool, linen chemise', landmark: null, art: 'art/lady-dress-1.svg' },
+    { id: 2, era: 'tudor', name: 'Grey Wool Kirtle', desc: 'Undyed grey wool, leather girdle', landmark: null, art: 'art/lady-dress-2.svg' },
+    { id: 3, era: 'tudor', name: 'Embroidered Kirtle', desc: 'Madder-red wool, blackwork neckline, apron', landmark: 'dover', art: 'art/lady-dress-3.svg' },
+    { id: 4, era: 'tudor', name: 'Fur-Trimmed Gown', desc: 'Dark green wool, fur cuffs, brass girdle', landmark: 'dover', art: 'art/lady-dress-4.svg' },
+    { id: 5, era: 'tudor', name: 'Damask Gown', desc: 'Tawny silk damask, gold caul', landmark: 'tower', art: 'art/lady-dress-5.svg' },
+    { id: 6, era: 'tudor', name: 'Velvet Court Gown', desc: 'Deep blue velvet, gold aglets, jeweled girdle', landmark: 'tower', art: 'art/lady-dress-6.svg' },
+    { id: 7, era: 'tudor', name: 'Cloth of Silver', desc: 'Silver tissue gown, pearl edging', landmark: 'hampton', art: 'art/lady-dress-7.svg' },
+    { id: 8, era: 'tudor', name: 'Cloth of Gold', desc: 'Gold brocade state gown, ermine trim', landmark: 'hampton', art: 'art/lady-dress-8.svg' },
+    { id: 9, era: 'edwardian', name: 'Cotton Day Dress', desc: 'Plain white cotton, simple collar', landmark: 'towerbridge', art: 'art/lady-dress-9.svg' },
+    { id: 10, era: 'edwardian', name: 'Shirtwaist & Skirt', desc: 'Striped blouse, dark serge skirt', landmark: 'towerbridge', art: 'art/lady-dress-10.svg' },
+    { id: 11, era: 'edwardian', name: 'Walking Suit', desc: 'Beige linen jacket and long skirt', landmark: 'harrods', art: 'art/lady-dress-11.svg' },
+    { id: 12, era: 'edwardian', name: 'Lace Tea Gown', desc: 'Pastel pink, lace-trimmed, flowing', landmark: 'harrods', art: 'art/lady-dress-12.svg' },
+    { id: 13, era: 'edwardian', name: 'Silk Evening Dress', desc: 'Pale blue silk, empire waistline', landmark: 'ritz', art: 'art/lady-dress-13.svg' },
+    { id: 14, era: 'edwardian', name: 'Beaded Evening Gown', desc: 'Ivory, sparkling beadwork bodice', landmark: 'ritz', art: 'art/lady-dress-14.svg' },
+    { id: 15, era: 'edwardian', name: 'Velvet Opera Coat', desc: 'Burgundy velvet over champagne silk', landmark: null, art: 'art/lady-dress-15.svg' },
+    { id: 16, era: 'edwardian', name: 'Court Presentation Gown', desc: 'White, long train, feather headdress', landmark: null, art: 'art/lady-dress-16.svg' }
   ];
-  var DRESS_BY_LANDMARK = { dover: [3, 4], tower: [5, 6], hampton: [7, 8] };
+  var DRESS_BY_LANDMARK = { dover: [3, 4], tower: [5, 6], hampton: [7, 8],
+    towerbridge: [9, 10], harrods: [11, 12], ritz: [13, 14] };
+  /* Final dresses of an era: awarded once when the whole era is complete. */
+  var DRESS_BY_ERA_BONUS = { edwardian: [15, 16] };
 
   function dressById(id) {
     for (var i = 0; i < DRESSES.length; i++) if (DRESSES[i].id === id) return DRESSES[i];
@@ -47,7 +97,8 @@
     { id: 'bond-builder', emoji: '🧮', name: 'Bond Builder', desc: 'Secured Number Bonds' },
     { id: 'place-pro', emoji: '🏰', name: 'Place Value Pro', desc: 'Secured Place Value' },
     { id: 'hot-streak', emoji: '🔥', name: 'Hot Streak', desc: 'Practised 3 days in a row' },
-    { id: 'explorer', emoji: '🗺️', name: 'Tudor Explorer', desc: 'Unlocked all 3 landmarks' }
+    { id: 'explorer', emoji: '🗺️', name: 'Tudor Explorer', desc: 'Unlocked all 3 Tudor landmarks' },
+    { id: 'edwardian-explorer', emoji: '🚂', name: '1900s Explorer', desc: 'Completed 1900s London' }
   ];
 
   var PRAISE = ['Well done!', 'Brilliant!', 'Super work!', 'You got it!', 'Amazing!'];
@@ -115,20 +166,54 @@
     $('streak-val').textContent = p.streak;
     guideGreeting();
     updateGuidePortrait();
-    ['bonds', 'placevalue'].forEach(function (t) {
-      $('level-' + t).textContent = 'Level ' + topics[t].level;
-      $('secure-' + t).hidden = !Store.topicSecure(t);
+
+    /* Quest cards: one per topic in each unlocked era, plus a teaser for locked eras. */
+    var tpHtml = '';
+    ERAS.forEach(function (era) {
+      if (!eraUnlocked(era)) {
+        tpHtml += '<div class="era-lock">🔒 <b>' + era.name + '</b><br>Finish the ' +
+          eraById(era.requires).name + ' era to unlock new quests.</div>';
+        return;
+      }
+      era.topics.forEach(function (t) {
+        var meta = TOPIC_META[t];
+        tpHtml += '<button class="topic-card" id="topic-' + t + '" aria-label="Start ' + TOPIC_NAMES[t] + ' quest">' +
+          '<div class="topic-emoji" aria-hidden="true">' + meta.emoji + '</div>' +
+          '<div class="topic-name">' + TOPIC_NAMES[t] + '</div>' +
+          '<div class="topic-sub">' + meta.sub + '</div>' +
+          '<div class="topic-level">Level ' + topics[t].level + '</div>' +
+          (Store.topicSecure(t) ? '<div class="secure-flag">Secure ✓</div>' : '') +
+          '</button>';
+      });
+    });
+    $('topics').innerHTML = tpHtml;
+    ERAS.forEach(function (era) {
+      if (!eraUnlocked(era)) return;
+      era.topics.forEach(function (t) {
+        $('topic-' + t).addEventListener('click', function () { startSession(t); });
+      });
     });
 
+    /* Landmarks grouped by era. */
     var lmHtml = '';
-    LANDMARKS.forEach(function (lm) {
-      var un = p.landmarks.indexOf(lm.id) !== -1;
-      lmHtml += '<div class="landmark' + (un ? ' unlocked' : '') + '">' +
-        '<div class="lm-emoji">' + lm.emoji + '</div>' +
-        '<div class="lm-name">' + lm.name + '</div>' +
-        (un ? '<div class="lm-fact">' + lm.fact + '</div>'
-            : '<div class="lm-lock">🔒<br>' + lm.how + '</div>') +
-        '</div>';
+    ERAS.forEach(function (era) {
+      lmHtml += '<h3 class="era-head">' + era.name + (eraUnlocked(era) ? '' : ' 🔒') + '</h3>';
+      if (!eraUnlocked(era)) {
+        lmHtml += '<div class="era-lock">Finish the ' + eraById(era.requires).name + ' era to unlock.</div>';
+        return;
+      }
+      lmHtml += '<div class="landmarks">';
+      LANDMARKS.forEach(function (lm) {
+        if (lm.era !== era.id) return;
+        var un = p.landmarks.indexOf(lm.id) !== -1;
+        lmHtml += '<div class="landmark' + (un ? ' unlocked' : '') + '">' +
+          '<div class="lm-emoji">' + lm.emoji + '</div>' +
+          '<div class="lm-name">' + lm.name + '</div>' +
+          (un ? '<div class="lm-fact">' + lm.fact + '</div>'
+              : '<div class="lm-lock">🔒<br>' + lm.how + '</div>') +
+          '</div>';
+      });
+      lmHtml += '</div>';
     });
     $('landmarks').innerHTML = lmHtml;
 
@@ -150,17 +235,22 @@
   function renderWardrobe() {
     var w = Store.wardrobe();
     var html = '';
-    DRESSES.forEach(function (d) {
-      var owned = w.unlocked.indexOf(d.id) !== -1;
-      var sel = w.selected === d.id;
-      html += '<button class="dress-card' + (owned ? '' : ' locked') + (sel ? ' selected' : '') + '"' +
-        ' data-dress="' + d.id + '"' + (owned ? '' : ' disabled') + '>' +
-        '<img class="dress-img" src="' + d.art + '" alt="' + d.name + '">' +
-        '<div class="dress-name">' + d.name + '</div>' +
-        '<div class="dress-desc">' + d.desc + '</div>' +
-        (owned ? (sel ? '<div class="dress-worn">Wearing ✓</div>' : '<div class="dress-worn pick">Tap to wear</div>')
-               : '<div class="dress-lock">🔒 ' + landmarkName(d.landmark) + '</div>') +
-        '</button>';
+    ERAS.forEach(function (era) {
+      html += '<h3 class="era-head">' + era.name + '</h3><div class="wardrobe-grid">';
+      DRESSES.forEach(function (d) {
+        if (d.era !== era.id) return;
+        var owned = w.unlocked.indexOf(d.id) !== -1;
+        var sel = w.selected === d.id;
+        html += '<button class="dress-card' + (owned ? '' : ' locked') + (sel ? ' selected' : '') + '"' +
+          ' data-dress="' + d.id + '"' + (owned ? '' : ' disabled') + '>' +
+          '<img class="dress-img" src="' + d.art + '" alt="' + d.name + '">' +
+          '<div class="dress-name">' + d.name + '</div>' +
+          '<div class="dress-desc">' + d.desc + '</div>' +
+          (owned ? (sel ? '<div class="dress-worn">Wearing ✓</div>' : '<div class="dress-worn pick">Tap to wear</div>')
+                 : '<div class="dress-lock">🔒 ' + (d.landmark ? landmarkName(d.landmark) : 'Complete ' + era.name) + '</div>') +
+          '</button>';
+      });
+      html += '</div>';
     });
     $('wardrobe-grid').innerHTML = html;
     var cards = $('wardrobe-grid').querySelectorAll('.dress-card:not(.locked)');
@@ -391,13 +481,31 @@
     if (p.sessionsCompleted >= 5 && Store.unlockLandmark('hampton')) {
       earned.push('🌳 Hampton Court unlocked!'); awardDresses('hampton', earned);
     }
+    if (Store.topicSecure('fractions') && Store.unlockLandmark('towerbridge')) {
+      earned.push('🌉 Tower Bridge unlocked!'); awardDresses('towerbridge', earned);
+    }
+    if (Store.topicSecure('measures') && Store.unlockLandmark('harrods')) {
+      earned.push('🛍️ Harrods unlocked!'); awardDresses('harrods', earned);
+    }
+    if (p.sessionsCompleted >= 10 && Store.unlockLandmark('ritz')) {
+      earned.push('🎩 The Ritz unlocked!'); awardDresses('ritz', earned);
+    }
+    /* Era-completion bonuses: final dresses plus explorer badges. */
+    ERAS.forEach(function (era) {
+      if (!era.requires) return;
+      if (eraComplete(era) && Store.giveEraBonus(era.id)) {
+        var added = Store.unlockDresses(DRESS_BY_ERA_BONUS[era.id] || []);
+        earned.push('🎉 ' + era.name + ' complete!' + (added.length ? ' ' + added.length + ' final dresses earned!' : ''));
+      }
+    });
     if (Store.awardBadge('first-session')) earned.push('🚀 Badge: First Quest');
     if (S.correctFirst >= 10 && Store.awardBadge('sharpshooter')) earned.push('🎯 Badge: Super Solver');
     if (Store.topicSecure('bonds') && Store.awardBadge('bond-builder')) earned.push('🧮 Badge: Bond Builder');
     if (Store.topicSecure('placevalue') && Store.awardBadge('place-pro')) earned.push('🏰 Badge: Place Value Pro');
     p = Store.profile();
     if (p.streak >= 3 && Store.awardBadge('hot-streak')) earned.push('🔥 Badge: Hot Streak');
-    if (p.landmarks.length >= 3 && Store.awardBadge('explorer')) earned.push('🗺️ Badge: Tudor Explorer');
+    if (eraComplete(eraById('tudor')) && Store.awardBadge('explorer')) earned.push('🗺️ Badge: Tudor Explorer');
+    if (eraComplete(eraById('edwardian')) && Store.awardBadge('edwardian-explorer')) earned.push('🚂 Badge: 1900s Explorer');
   }
 
   function finishSession() {
@@ -448,7 +556,7 @@
     $('d-points').textContent = p.points;
 
     var th = '';
-    ['bonds', 'placevalue'].forEach(function (t) {
+    window.MRW.TOPICS.forEach(function (t) {
       var acc = Store.topicAccuracy(t), att = Store.topicAttempts(t);
       th += '<div class="dash-row"><span>' + TOPIC_NAMES[t] +
         ' <span style="color:#4a5578">(' + att + ' tries)</span></span>' +
@@ -457,7 +565,7 @@
     $('d-topics').innerHTML = th;
 
     var sec = [], prog = [];
-    ['bonds', 'placevalue'].forEach(function (t) {
+    window.MRW.TOPICS.forEach(function (t) {
       (Store.topicSecure(t) ? sec : prog).push(TOPIC_NAMES[t]);
     });
     $('d-secure').innerHTML =
@@ -497,8 +605,7 @@
       show('screen-home');
     });
 
-    $('topic-bonds').addEventListener('click', function () { startSession('bonds'); });
-    $('topic-placevalue').addEventListener('click', function () { startSession('placevalue'); });
+    /* Topic cards are rendered dynamically in renderHome (era-gated). */
     $('next-btn').addEventListener('click', nextQuestion);
     $('speak-btn').addEventListener('click', function () {
       if (S) speak(currentQ().speak);

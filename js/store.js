@@ -62,10 +62,16 @@
     saveFacts: function (f) { this.set('facts', f); },
 
     topics: function () {
-      return this.get('topics', {
+      /* Merge with defaults so older saves gain new topics (e.g. fractions). */
+      var d = {
         bonds: { level: 1, cc: 0, cw: 0 },
-        placevalue: { level: 1, cc: 0, cw: 0 }
-      });
+        placevalue: { level: 1, cc: 0, cw: 0 },
+        fractions: { level: 1, cc: 0, cw: 0 },
+        measures: { level: 1, cc: 0, cw: 0 }
+      };
+      var t = this.get('topics', {});
+      Object.keys(d).forEach(function (k) { if (!t[k]) t[k] = d[k]; });
+      return t;
     },
     saveTopics: function (t) { this.set('topics', t); },
 
@@ -171,6 +177,14 @@
     unlockLandmark: function (id) {
       var p = this.profile();
       if (p.landmarks.indexOf(id) === -1) { p.landmarks.push(id); this.saveProfile(p); return true; }
+      return false;
+    },
+
+    /* One-off era-completion bonuses (e.g. final dresses), so they are given once. */
+    eraBonusGiven: function (era) { return this.get('eraBonus', []).indexOf(era) !== -1; },
+    giveEraBonus: function (era) {
+      var b = this.get('eraBonus', []);
+      if (b.indexOf(era) === -1) { b.push(era); this.set('eraBonus', b); return true; }
       return false;
     },
 

@@ -254,7 +254,6 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
   background: var(--card); border: 2px solid var(--gold); border-radius: 999px;
   font-size: 17px; font-weight: 800; color: var(--ink); cursor: pointer;
 }
-.wardrobe { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 24px; }
 .dress-card {
   background: var(--card); border: 2px solid var(--line); border-radius: var(--radius);
   padding: 10px 8px 12px; text-align: center; cursor: pointer; font-family: inherit;
@@ -271,3 +270,12 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
 .dress-worn { font-size: 13px; font-weight: 800; color: var(--accent); margin-top: 6px; min-height: 18px; }
 .dress-worn.pick { color: var(--ink-soft); font-weight: 600; }
 .dress-lock { font-size: 13px; color: var(--ink-soft); margin-top: 6px; min-height: 18px; }
+
+/* ---------- eras ---------- */
+.era-head { font-size: 17px; margin: 22px 0 8px; color: var(--ink); }
+.era-lock {
+  background: var(--card); border: 2px dashed var(--line); border-radius: var(--radius);
+  padding: 16px; text-align: center; color: var(--ink-soft); font-size: 15px; margin-bottom: 10px;
+}
+.wardrobe { padding-bottom: 16px; }
+.wardrobe-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 8px; }

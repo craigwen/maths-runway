@@ -1,5 +1,5 @@
 /* Maths Runway service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-runway-v10';
+var CACHE = 'maths-runway-v11';
 var FILES = [
   './',
   './index.html',
@@ -21,7 +21,15 @@ var FILES = [
   './art/lady-dress-5.svg',
   './art/lady-dress-6.svg',
   './art/lady-dress-7.svg',
-  './art/lady-dress-8.svg'
+  './art/lady-dress-8.svg',
+  './art/lady-dress-9.svg',
+  './art/lady-dress-10.svg',
+  './art/lady-dress-11.svg',
+  './art/lady-dress-12.svg',
+  './art/lady-dress-13.svg',
+  './art/lady-dress-14.svg',
+  './art/lady-dress-15.svg',
+  './art/lady-dress-16.svg'
 ];
 
 self.addEventListener('install', function (event) {
