@@ -1,7 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#1f2a44"/>
-  <text x="256" y="330" font-size="220" text-anchor="middle" font-family="Georgia, serif" fill="#fef3c7">7</text>
-  <path d="M120 400 L256 440 L392 400" stroke="#d69e2e" stroke-width="24" fill="none" stroke-linecap="round"/>
-  <circle cx="150" cy="150" r="26" fill="#d69e2e"/>
-  <circle cx="362" cy="150" r="26" fill="#d69e2e"/>
+  <defs>
+    <radialGradient id="gold" cx="35%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#ffe9a8"/>
+      <stop offset="55%" stop-color="#f0c453"/>
+      <stop offset="100%" stop-color="#b97f1f"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#001645"/>
+  <g fill="none" stroke="url(#gold)" stroke-linecap="round">
+    <path d="M112 210 L112 424" stroke-width="44"/>
+    <path d="M256 210 L256 424" stroke-width="44"/>
+    <path d="M400 210 L400 424" stroke-width="44"/>
+    <path d="M112 210 L184 305 L256 210" stroke-width="30" stroke-linejoin="round"/>
+    <path d="M256 210 L328 305 L400 210" stroke-width="30" stroke-linejoin="round"/>
+  </g>
+  <circle cx="112" cy="124" r="40" fill="url(#gold)"/>
+  <circle cx="256" cy="124" r="40" fill="url(#gold)"/>
+  <circle cx="400" cy="124" r="40" fill="url(#gold)"/>
 </svg>
