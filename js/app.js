@@ -132,21 +132,6 @@
     return a;
   }
 
-  function speak(text) {
-    try {
-      var synth = window.speechSynthesis;
-      if (!synth) return;
-      synth.cancel();
-      var u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.95;
-      var voices = synth.getVoices();
-      for (var i = 0; i < voices.length; i++) {
-        if (voices[i].lang && voices[i].lang.indexOf('en-GB') === 0) { u.voice = voices[i]; break; }
-      }
-      synth.speak(u);
-    } catch (e) { /* speech is a nice-to-have */ }
-  }
-
   /* ---------------- home ---------------- */
   function updateGuidePortrait() {
     var dress = dressById(Store.wardrobe().selected);
@@ -604,11 +589,7 @@
 
     /* Topic cards are rendered dynamically in renderHome (era-gated). */
     $('next-btn').addEventListener('click', nextQuestion);
-    $('speak-btn').addEventListener('click', function () {
-      if (S) speak(currentQ().speak);
-    });
     $('quit-btn').addEventListener('click', function () {
-      try { window.speechSynthesis.cancel(); } catch (e) {}
       S = null;
       renderHome();
       show('screen-home');
@@ -621,9 +602,5 @@
       renderHome();
       show('screen-home');
     });
-
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices(); /* warm up voice list */
-    }
   });
 })();
