@@ -47,7 +47,7 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
   border-bottom: 3px solid var(--gold);
   border-radius: 0 0 var(--radius) var(--radius);
 }
-.brand { font-size: 24px; font-weight: 800; color: #fdf6e9; letter-spacing: 0.5px; }
+.brand-logo { height: 54px; width: auto; display: block; border-radius: 8px; }
 .tagline { color: var(--ink-soft); margin: 0 0 6px; font-size: 16px; }
 
 .pills { display: flex; gap: 8px; }

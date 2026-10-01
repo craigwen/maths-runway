@@ -1,5 +1,5 @@
 /* Maths Masters service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-masters-v18';
+var CACHE = 'maths-masters-v19';
 var FILES = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ var FILES = [
   './icons/apple-touch-icon.png',
   './art/lady-court-v3.svg',
   './art/lady-garden-v3.svg',
+  './art/logo.svg',
   './art/lady-dress-1.svg',
   './art/lady-dress-2.svg',
   './art/lady-dress-3.svg',
