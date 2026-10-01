@@ -1,11 +1,12 @@
 /* Maths Masters service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-masters-v19';
+var CACHE = 'maths-masters-v20';
 var FILES = [
   './',
   './index.html',
   './styles.css',
   './manifest.json',
   './js/store.js',
+  './js/restore.js',
   './js/questions.js',
   './js/app.js',
   './icons/icon.svg',

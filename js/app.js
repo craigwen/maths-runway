@@ -612,6 +612,14 @@
           '<span class="pct">' + Math.round(w.acc * 100) + '%</span></div>';
       }).join('');
     }
+    var rb = $('restore-btn');
+    if (rb) rb.onclick = function () {
+      if (window.confirm('Replace this device\u2019s progress with Rhea\u2019s 1 Oct snapshot (8 sessions, 900 points)?')) {
+        window.MRW.restoreRheaProgress();
+        renderDashboard();
+        renderHome();
+      }
+    };
   }
 
   /* ---------------- wiring ---------------- */

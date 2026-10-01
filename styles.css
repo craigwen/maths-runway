@@ -267,6 +267,12 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
   background: var(--card); border: 2px solid var(--gold); border-radius: 999px;
   font-size: 17px; font-weight: 800; color: var(--ink); cursor: pointer;
 }
+.restore-btn {
+  display: block; margin: 8px auto 0; padding: 10px 22px; min-height: 48px;
+  background: var(--card); border: 2px solid var(--gold); border-radius: 999px;
+  font-size: 17px; font-weight: 800; color: var(--ink); cursor: pointer;
+  font-family: inherit;
+}
 .dress-card {
   background: var(--card); border: 2px solid var(--line); border-radius: var(--radius);
   padding: 10px 8px 12px; text-align: center; cursor: pointer; font-family: inherit;
