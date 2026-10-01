@@ -16,6 +16,62 @@
     Store.saveRequeue([]);
   }
 
+  /* Backup codes: the whole progress snapshot as a short text code Craig
+     can paste into Apple Notes. Unlike the frozen 1 Oct snapshot above,
+     a backup restores progress as of the moment it was copied. */
+  var BACKUP_PREFIX = 'MM1.';
+
+  function slimFacts(facts) {
+    var out = {};
+    Object.keys(facts).forEach(function (id) {
+      var r = facts[id];
+      out[id] = { a: r.a, c: r.c }; /* last is write-only; drop it */
+    });
+    return out;
+  }
+
+  function exportBackupCode() {
+    var Store = global.MRW.Store;
+    var data = {
+      v: 1,
+      profile: Store.profile(),
+      topics: Store.topics(),
+      wardrobe: Store.wardrobe(),
+      facts: slimFacts(Store.facts()),
+      requeue: Store.requeue()
+    };
+    return BACKUP_PREFIX + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  }
+
+  function parseBackupCode(code) {
+    code = String(code || '').trim().replace(/\s+/g, '');
+    if (code.indexOf(BACKUP_PREFIX) !== 0) throw new Error('not a Maths Masters backup code');
+    var data = JSON.parse(decodeURIComponent(escape(atob(code.slice(BACKUP_PREFIX.length)))));
+    if (!data || data.v !== 1 || !data.profile || typeof data.profile.sessionsCompleted !== 'number' ||
+        !data.topics || !data.topics.bonds || !data.wardrobe || !data.facts) {
+      throw new Error('backup code is damaged');
+    }
+    return data;
+  }
+
+  function applyBackupData(data) {
+    var Store = global.MRW.Store;
+    var facts = {};
+    Object.keys(data.facts).forEach(function (id) {
+      var r = data.facts[id];
+      facts[id] = { a: r.a | 0, c: r.c | 0, last: 0 };
+    });
+    Store.saveProfile(data.profile);
+    Store.saveTopics(data.topics);
+    Store.saveWardrobe(data.wardrobe);
+    Store.set('facts', facts);
+    Store.saveRequeue(data.requeue || []);
+    return data.profile;
+  }
+
   global.MRW = global.MRW || {};
   global.MRW.restoreRheaProgress = restoreRheaProgress;
+  global.MRW.exportBackupCode = exportBackupCode;
+  global.MRW.parseBackupCode = parseBackupCode;
+  global.MRW.applyBackupData = applyBackupData;
 })(window);

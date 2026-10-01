@@ -629,6 +629,55 @@
       renderDashboard();
       renderHome();
     };
+    var bex = $('backup-export-btn');
+    if (bex) bex.onclick = function () {
+      var code;
+      try {
+        code = window.MRW.exportBackupCode();
+      } catch (e) {
+        window.alert('Could not make a backup code: ' + (e && e.message ? e.message : String(e)));
+        return;
+      }
+      var ta = $('backup-code');
+      ta.value = code;
+      ta.focus();
+      ta.select();
+      var copied = false;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(code).then(function () {
+            window.alert('Backup code copied. Paste it into Apple Notes.');
+          }, function () {
+            window.alert('Copy the code below into Apple Notes manually.');
+          });
+          copied = true;
+        } else if (document.execCommand('copy')) {
+          copied = true;
+          window.alert('Backup code copied. Paste it into Apple Notes.');
+        }
+      } catch (e) { /* fall through to manual copy */ }
+      if (!copied) window.alert('Copy the code below into Apple Notes manually.');
+    };
+    var bim = $('backup-import-btn');
+    if (bim) bim.onclick = function () {
+      var ta = $('backup-restore-input');
+      var code = ta ? ta.value : '';
+      if (!code.trim()) { window.alert('Paste a backup code first.'); return; }
+      var data;
+      try {
+        data = window.MRW.parseBackupCode(code);
+      } catch (e) {
+        window.alert('That code did not work: ' + (e && e.message ? e.message : String(e)));
+        return;
+      }
+      var p = data.profile;
+      if (!window.confirm('Restore backup (' + p.sessionsCompleted + ' sessions, ' + p.points +
+          ' points)? This replaces this device\u2019s progress.')) return;
+      window.MRW.applyBackupData(data);
+      window.alert('Backup restored: ' + p.sessionsCompleted + ' sessions, ' + p.points + ' points.');
+      renderDashboard();
+      renderHome();
+    };
   }
 
   /* ---------------- wiring ---------------- */
