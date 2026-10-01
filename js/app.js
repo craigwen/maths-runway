@@ -20,8 +20,8 @@
     { id: 'towerbridge', era: 'edwardian', emoji: '🌉', name: 'Tower Bridge',
       fact: 'Tower Bridge opened in 1894. Its road lifts up to let tall ships pass beneath.',
       how: 'Secure Fractions' },
-    { id: 'harrods', era: 'edwardian', emoji: '🛍️', name: 'Harrods',
-      fact: 'Harrods opened its famous Knightsbridge store in 1905.',
+    { id: 'buckingham', era: 'edwardian', emoji: '💂', name: 'Buckingham Palace',
+      fact: "Buckingham Palace is the King's London home. The King's Guard changes at a precise time, to the very minute.",
       how: 'Secure Measures' },
     { id: 'ritz', era: 'edwardian', emoji: '🎩', name: 'The Ritz',
       fact: 'The Ritz opened in 1906 and became the fanciest hotel in London.',
@@ -34,7 +34,7 @@
     { id: 'tudor', name: 'Tudor England', topics: ['bonds', 'placevalue'],
       landmarkIds: ['dover', 'tower', 'hampton'], dressIds: [1, 2, 3, 4, 5, 6, 7, 8] },
     { id: 'edwardian', name: '1900s London', topics: ['fractions', 'measures'],
-      landmarkIds: ['towerbridge', 'harrods', 'ritz'], dressIds: [9, 10, 11, 12, 13, 14, 15, 16],
+      landmarkIds: ['towerbridge', 'buckingham', 'ritz'], dressIds: [9, 10, 11, 12, 13, 14, 15, 16],
       requires: 'tudor' }
   ];
 
@@ -70,15 +70,15 @@
     { id: 8, era: 'tudor', name: 'Cloth of Gold', desc: 'Gold brocade state gown, ermine trim', landmark: 'hampton', art: 'art/lady-dress-8.svg' },
     { id: 9, era: 'edwardian', name: 'Cotton Day Dress', desc: 'Plain white cotton, simple collar', landmark: 'towerbridge', art: 'art/lady-dress-9.svg' },
     { id: 10, era: 'edwardian', name: 'Shirtwaist & Skirt', desc: 'Striped blouse, dark serge skirt', landmark: 'towerbridge', art: 'art/lady-dress-10.svg' },
-    { id: 11, era: 'edwardian', name: 'Walking Suit', desc: 'Beige linen jacket and long skirt', landmark: 'harrods', art: 'art/lady-dress-11.svg' },
-    { id: 12, era: 'edwardian', name: 'Lace Tea Gown', desc: 'Pastel pink, lace-trimmed, flowing', landmark: 'harrods', art: 'art/lady-dress-12.svg' },
+    { id: 11, era: 'edwardian', name: 'Walking Suit', desc: 'Beige linen jacket and long skirt', landmark: 'buckingham', art: 'art/lady-dress-11.svg' },
+    { id: 12, era: 'edwardian', name: 'Lace Tea Gown', desc: 'Pastel pink, lace-trimmed, flowing', landmark: 'buckingham', art: 'art/lady-dress-12.svg' },
     { id: 13, era: 'edwardian', name: 'Silk Evening Dress', desc: 'Pale blue silk, empire waistline', landmark: 'ritz', art: 'art/lady-dress-13.svg' },
     { id: 14, era: 'edwardian', name: 'Beaded Evening Gown', desc: 'Ivory, sparkling beadwork bodice', landmark: 'ritz', art: 'art/lady-dress-14.svg' },
     { id: 15, era: 'edwardian', name: 'Velvet Opera Coat', desc: 'Burgundy velvet over champagne silk', landmark: null, art: 'art/lady-dress-15.svg' },
     { id: 16, era: 'edwardian', name: 'Court Presentation Gown', desc: 'White, long train, feather headdress', landmark: null, art: 'art/lady-dress-16.svg' }
   ];
   var DRESS_BY_LANDMARK = { dover: [3, 4], tower: [5, 6], hampton: [7, 8],
-    towerbridge: [9, 10], harrods: [11, 12], ritz: [13, 14] };
+    towerbridge: [9, 10], buckingham: [11, 12], ritz: [13, 14] };
   /* Final dresses of an era: awarded once when the whole era is complete. */
   var DRESS_BY_ERA_BONUS = { edwardian: [15, 16] };
 
@@ -484,8 +484,8 @@
     if (Store.topicSecure('fractions') && Store.unlockLandmark('towerbridge')) {
       earned.push('🌉 Tower Bridge unlocked!'); awardDresses('towerbridge', earned);
     }
-    if (Store.topicSecure('measures') && Store.unlockLandmark('harrods')) {
-      earned.push('🛍️ Harrods unlocked!'); awardDresses('harrods', earned);
+    if (Store.topicSecure('measures') && Store.unlockLandmark('buckingham')) {
+      earned.push('💂 Buckingham Palace unlocked!'); awardDresses('buckingham', earned);
     }
     if (p.sessionsCompleted >= 10 && Store.unlockLandmark('ritz')) {
       earned.push('🎩 The Ritz unlocked!'); awardDresses('ritz', earned);
