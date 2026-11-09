@@ -220,6 +220,10 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
   background: var(--card); border: 2px solid var(--line); border-radius: 12px;
   padding: 12px 14px; margin-bottom: 8px; font-size: 17px;
 }
+/* Five topics now: keep the row label on one line ("In progress" was
+   splitting across two) and let the value wrap instead. */
+.dash-row span:first-child { white-space: nowrap; flex-shrink: 0; margin-right: 12px; }
+.dash-row span:last-child { text-align: right; }
 .dash-row .pct { font-weight: 800; }
 .work-item { font-size: 16px; }
 .work-item .pct { color: var(--kind); font-weight: 800; }

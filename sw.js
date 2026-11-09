@@ -1,5 +1,5 @@
 /* Maths Masters service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-masters-v25';
+var CACHE = 'maths-masters-v26';
 var FILES = [
   './',
   './index.html',
