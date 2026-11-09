@@ -1,5 +1,5 @@
 /* Maths Masters - question engine.
-   Generated (never hardcoded) questions for two topics, three levels
+   Generated (never hardcoded) questions for five topics, three levels
    each. Generators accept optional params so a stored fact id can be
    re-asked with the SAME numbers (spaced repetition).
    No DOM access here, so the logic is testable in Node. */
@@ -71,12 +71,29 @@
       delete q.choiceFrom;
     } else if (mcOrPad(rng, forceMc) === 'mc' || q.format === 'mc') {
       q.format = 'mc';
-      var ds = distractors(q._ansNum, rng, 2);
-      q.choices = rng.shuffle([q._ansNum].concat(ds)).map(String);
+      /* Column questions pass their own distractors: the classic
+         error (the answer you get if you forget to exchange) first,
+         then a near miss. Fill any gap from the generic pool. */
+      var ds = [];
+      if (q._distractors) {
+        q._distractors.forEach(function (d) {
+          if (typeof d === 'number' && d >= 0 && d !== q._ansNum && ds.indexOf(d) === -1) ds.push(d);
+        });
+      }
+      var guard = 0;
+      while (ds.length < 2 && guard++ < 8) {
+        distractors(q._ansNum, rng, 2).forEach(function (d) {
+          if (ds.length < 2 && ds.indexOf(d) === -1) ds.push(d);
+        });
+        if (ds.length < 2) ds.push(q._ansNum + 3 + ds.length * 7);
+      }
+      q.choices = rng.shuffle([q._ansNum].concat(ds.slice(0, 2))).map(String);
+      delete q._distractors;
     } else {
       q.format = 'pad';
     }
     delete q._ansNum;
+    delete q._distractors;
     q.answer = String(q.answer);
     return q;
   }
@@ -739,9 +756,312 @@
     ]
   };
 
-  var GEN = { bonds: Bonds, placevalue: PlaceValue, fractions: Fractions, measures: Measures };
-  var TOPICS = ['bonds', 'placevalue', 'fractions', 'measures'];
-  var TOPIC_NAMES = { bonds: 'Number Bonds', placevalue: 'Place Value', fractions: 'Fractions', measures: 'Measures' };
+  /* ================= COLUMN ADDITION & SUBTRACTION =================
+     Formal written method, hundreds/tens/ones, with exchanging.
+     Questions are shown as a vertical column sum, the way school
+     writes them. The multiple-choice distractors include the classic
+     error: the answer you get if you forget to exchange. */
+  var PLACES = ['ones', 'tens', 'hundreds', 'thousands'];
+  var PLACE_LETTERS = ['Th', 'H', 'T', 'O'];
+
+  function dAt(n, i) { return Math.floor(n / Math.pow(10, i)) % 10; }
+
+  function colDigits(n, nCols) {
+    var s = String(n), out = [];
+    for (var i = 0; i < nCols; i++) {
+      var pos = s.length - 1 - i;
+      out.unshift(pos >= 0 ? s[pos] : '');
+    }
+    return out;
+  }
+
+  /* Vertical column layout: header row (H T O), the two numbers, a
+     rule, and a row of ? marks where the answer goes. */
+  function colHtml(a, b, op, ans) {
+    var nCols = Math.max(String(a).length, String(b).length, String(ans).length);
+    var labels = PLACE_LETTERS.slice(4 - nCols);
+    function row(cells, cls) {
+      var h = '<div class="col-row' + (cls ? ' ' + cls : '') + '">';
+      cells.forEach(function (c) { h += '<span>' + c + '</span>'; });
+      return h + '</div>';
+    }
+    var qmarks = [];
+    for (var i = 0; i < nCols; i++) qmarks.push('?');
+    var opWord = op === '+' ? 'plus' : 'take away';
+    return '<div class="colsum" aria-label="' + a + ' ' + opWord + ' ' + b + '">' +
+      row([''].concat(labels), 'col-head') +
+      row([''].concat(colDigits(a, nCols))) +
+      row([op].concat(colDigits(b, nCols))) +
+      '<div class="col-line"></div>' +
+      row([''].concat(qmarks), 'col-ans') +
+      '</div>';
+  }
+
+  /* The answer you get if you never exchange: each column worked on
+     its own. Addition: column sums without carrying. Subtraction:
+     smaller digit from larger digit in each column. */
+  function noExchangeAnswer(a, b, op) {
+    var da = String(a).split('').reverse().map(Number);
+    var db = String(b).split('').reverse().map(Number);
+    var n = Math.max(da.length, db.length), out = 0;
+    for (var i = 0; i < n; i++) {
+      var x = da[i] || 0, y = db[i] || 0;
+      var d = op === '+' ? (x + y) % 10 : Math.abs(x - y);
+      out += d * Math.pow(10, i);
+    }
+    return out;
+  }
+
+  /* Walk the columns right to left and narrate the working, step by
+     step, naming each exchange. Used for hints and reveals. */
+  function columnSteps(a, b, op) {
+    var da = String(a).split('').reverse().map(Number);
+    var db = String(b).split('').reverse().map(Number);
+    var n = Math.max(da.length, db.length);
+    var steps = [], carry = 0, borrow = 0;
+    for (var i = 0; i < n; i++) {
+      var x = da[i] || 0, y = db[i] || 0, place = PLACES[i];
+      if (op === '+') {
+        var parts = [x, y];
+        if (carry) parts.push(carry);
+        var s = x + y + carry, digit = s % 10, nc = Math.floor(s / 10);
+        var t = parts.join(' + ') + ' = ' + s + '.';
+        if (s >= 10) t += ' Write ' + digit + ' and carry ' + nc + '.';
+        else t += ' Write ' + digit + '.';
+        steps.push({ place: place, text: t });
+        carry = nc;
+      } else {
+        var top = x - borrow, d, t2 = '';
+        if (top < 0) {
+          /* The column is empty because one was already exchanged away:
+             borrow from the next column, keep 9 after giving one away. */
+          d = 9 - y;
+          t2 += 'There are no ' + place + ' left to exchange, so exchange 1 ' + PLACES[i + 1] +
+            ' for 10 ' + place + '. One of those goes to the ' + PLACES[i - 1] +
+            ', leaving 9. 9 − ' + y + ' = ' + d + '.';
+          borrow = 1;
+        } else if (top < y) {
+          d = top + 10 - y;
+          if (borrow) t2 += 'After the last exchange there are only ' + top + ' ' + place + ' left. ';
+          t2 += top + ' is less than ' + y + ', so exchange 1 ' + PLACES[i + 1] + ' for 10 ' + place + '. ' +
+            (top + 10) + ' − ' + y + ' = ' + d + '.';
+          borrow = 1;
+        } else {
+          d = top - y;
+          if (borrow) t2 += 'After the last exchange there are only ' + top + ' ' + place + ' left. ';
+          t2 += top + ' − ' + y + ' = ' + d + '.';
+          borrow = 0;
+        }
+        steps.push({ place: place, text: t2 });
+      }
+    }
+    if (op === '+' && carry) {
+      steps.push({ place: PLACES[n], text: 'Carry the ' + carry + ' into the ' + PLACES[n] + ' column.' });
+    }
+    return steps;
+  }
+
+  function columnReveal(a, b, op, ans) {
+    var steps = columnSteps(a, b, op);
+    var parts = steps.map(function (s) {
+      return s.place.charAt(0).toUpperCase() + s.place.slice(1) + ': ' + s.text;
+    });
+    return parts.join(' ') + ' The answer is ' + ans + '.';
+  }
+
+  /* Hint: point at the first column (from the right) that needs an exchange. */
+  function columnHint(a, b, op) {
+    var da = String(a).split('').reverse().map(Number);
+    var db = String(b).split('').reverse().map(Number);
+    var n = Math.max(da.length, db.length);
+    var carry = 0, borrow = 0;
+    for (var i = 0; i < n; i++) {
+      var x = da[i] || 0, y = db[i] || 0, place = PLACES[i];
+      if (op === '+') {
+        var s = x + y + carry;
+        if (s >= 10) {
+          return (i === 0 ? 'Start with the ' + place + ': ' : 'The ones are fine. Now the ' + place + ': ') +
+            x + ' + ' + y + (carry ? ' + ' + carry + ' carried' : '') + ' = ' + s +
+            '. You cannot write ' + s + ' in the ' + place + ' column. What do you write, and what do you carry?';
+        }
+        carry = Math.floor(s / 10);
+      } else {
+        var top = x - borrow;
+        if (top < y) {
+          return (i === 0 ? 'Start with the ' + place + ': ' : 'The ones are fine. Now the ' + place + ': ') +
+            top + ' take away ' + y + '. You cannot take ' + y + ' from ' + top + '. What do you exchange?';
+        }
+        borrow = 0;
+      }
+    }
+    return 'Work down the columns, ones first.';
+  }
+
+  function pickPair(rng, gen, ok, fallback) {
+    for (var g = 0; g < 100; g++) {
+      var p = gen();
+      if (ok(p[0], p[1])) return p;
+    }
+    return fallback;
+  }
+
+  function columnQ(rng, params, level, genIdx, a, b, op) {
+    var ans = op === '+' ? a + b : a - b;
+    var noEx = noExchangeAnswer(a, b, op);
+    var other = op === '+' ? ans - 10 : ans + 10;
+    return finish({
+      text: colHtml(a, b, op, ans),
+      speak: 'What is ' + a + ' ' + (op === '+' ? 'plus' : 'take away') + ' ' + b + '? Work it out in columns.',
+      answer: ans, _ansNum: ans,
+      _distractors: [noEx, other],
+      label: a + ' ' + op + ' ' + b + ' (column)',
+      hint: columnHint(a, b, op),
+      reveal: columnReveal(a, b, op, ans)
+    }, 'column', level, genIdx, params, rng);
+  }
+
+  var Column = {
+    1: [
+      function (rng, params) { /* 2-digit + 2-digit, ones exchange */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(11, 99), rng.int(11, 99)]; },
+            function (x, y) {
+              return (x % 10) + (y % 10) >= 10 && Math.floor(x / 10) + Math.floor(y / 10) + 1 <= 9;
+            }, [47, 35]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 1, 0, a, b, '+');
+      },
+      function (rng, params) { /* 2-digit - 2-digit, ones exchange */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(11, 99), rng.int(11, 99)]; },
+            function (x, y) {
+              return x > y && (x % 10) < (y % 10) &&
+                Math.floor(x / 10) - 1 >= Math.floor(y / 10) && x - y >= 10;
+            }, [63, 28]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 1, 1, a, b, '−');
+      },
+      function (rng, params) { /* 2-digit + 1-digit, ones exchange */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(11, 99), rng.int(2, 9)]; },
+            function (x, y) {
+              return (x % 10) + y >= 10 && Math.floor(x / 10) + 1 <= 9;
+            }, [47, 8]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 1, 2, a, b, '+');
+      }
+    ],
+    2: [
+      function (rng, params) { /* 3-digit + 3-digit, ones exchange only */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(101, 999), rng.int(101, 999)]; },
+            function (x, y) {
+              return dAt(x, 0) + dAt(y, 0) >= 10 && dAt(x, 1) + dAt(y, 1) + 1 <= 9 &&
+                dAt(x, 2) + dAt(y, 2) <= 9;
+            }, [347, 258]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 2, 0, a, b, '+');
+      },
+      function (rng, params) { /* 3-digit - 3-digit, ones exchange only */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(101, 999), rng.int(101, 999)]; },
+            function (x, y) {
+              return x > y && dAt(x, 0) < dAt(y, 0) &&
+                dAt(x, 1) - 1 >= dAt(y, 1) && dAt(x, 2) >= dAt(y, 2);
+            }, [463, 128]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 2, 1, a, b, '−');
+      },
+      function (rng, params) { /* 3-digit + 3-digit, tens exchange only */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(101, 999), rng.int(101, 999)]; },
+            function (x, y) {
+              return dAt(x, 0) + dAt(y, 0) <= 9 && dAt(x, 1) + dAt(y, 1) >= 10 &&
+                dAt(x, 2) + dAt(y, 2) + 1 <= 9;
+            }, [264, 183]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 2, 2, a, b, '+');
+      }
+    ],
+    3: [
+      function (rng, params) { /* 3-digit + 3-digit, ones AND tens exchange */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(101, 999), rng.int(101, 999)]; },
+            function (x, y) {
+              return dAt(x, 0) + dAt(y, 0) >= 10 && dAt(x, 1) + dAt(y, 1) + 1 >= 10 &&
+                dAt(x, 2) + dAt(y, 2) + 1 <= 10;
+            }, [486, 357]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 3, 0, a, b, '+');
+      },
+      function (rng, params) { /* 3-digit - 3-digit, exchange in ones AND tens */
+        var a, b;
+        if (params) { a = params[0]; b = params[1]; }
+        else {
+          var p = pickPair(rng,
+            function () { return [rng.int(101, 999), rng.int(101, 999)]; },
+            function (x, y) {
+              return x > y && dAt(x, 0) < dAt(y, 0) && dAt(x, 1) >= 1 &&
+                dAt(x, 1) - 1 < dAt(y, 1) && dAt(x, 2) - 1 >= dAt(y, 2);
+            }, [523, 268]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b], 3, 1, a, b, '−');
+      },
+      function (rng, params) { /* 3-digit +/- 2-digit, at least one exchange */
+        var a, b, sub;
+        if (params) { a = params[0]; b = params[1]; sub = params[2] === 1; }
+        else {
+          sub = rng.next() < 0.5;
+          var p = sub
+            ? pickPair(rng,
+              function () { return [rng.int(101, 999), rng.int(11, 99)]; },
+              function (x, y) {
+                return x > y && dAt(x, 0) < dAt(y, 0) && dAt(x, 1) - 1 >= dAt(y, 1);
+              }, [463, 28])
+            : pickPair(rng,
+              function () { return [rng.int(101, 999), rng.int(11, 99)]; },
+              function (x, y) {
+                return dAt(x, 0) + dAt(y, 0) >= 10 && dAt(x, 1) + dAt(y, 1) + 1 <= 9;
+              }, [347, 86]);
+          a = p[0]; b = p[1];
+        }
+        return columnQ(rng, [a, b, sub ? 1 : 0], 3, 2, a, b, sub ? '−' : '+');
+      }
+    ]
+  };
+
+  var GEN = { column: Column, bonds: Bonds, placevalue: PlaceValue, fractions: Fractions, measures: Measures };
+  var TOPICS = ['column', 'bonds', 'placevalue', 'fractions', 'measures'];
+  var TOPIC_NAMES = { column: 'Column Addition & Subtraction', bonds: 'Number Bonds', placevalue: 'Place Value', fractions: 'Fractions', measures: 'Measures' };
 
   function genQuestion(topic, level, rng) {
     rng = rng || new RNG();

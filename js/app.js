@@ -31,7 +31,7 @@
   /* Eras: each is a chapter with its own quests, landmarks and dresses.
      An era unlocks when the previous era is complete (all its landmarks). */
   var ERAS = [
-    { id: 'tudor', name: 'Tudor England', topics: ['bonds', 'placevalue'],
+    { id: 'tudor', name: 'Tudor England', topics: ['column', 'bonds', 'placevalue'],
       landmarkIds: ['dover', 'tower', 'hampton'], dressIds: [1, 2, 3, 4, 5, 6, 7, 8] },
     { id: 'edwardian', name: '1900s London', topics: ['fractions', 'measures'],
       landmarkIds: ['towerbridge', 'buckingham', 'ritz'], dressIds: [9, 10, 11, 12, 13, 14, 15, 16],
@@ -39,6 +39,7 @@
   ];
 
   var TOPIC_META = {
+    column: { emoji: '🔢', sub: 'Hundreds, tens, ones with exchanging' },
     bonds: { emoji: '🧮', sub: 'Making 10 and 20' },
     placevalue: { emoji: '🏰', sub: 'Numbers to 1000' },
     fractions: { emoji: '🍕', sub: 'Halves, quarters, thirds' },
@@ -79,7 +80,8 @@
     { id: 17, era: 'tudor', name: 'Coronation Robe', desc: 'Crimson velvet, ermine, gold clasps', landmark: null, bonus: 'master-bonds', art: 'art/lady-dress-17.svg' },
     { id: 18, era: 'tudor', name: 'Royal Purple Gown', desc: 'Purple silk damask, pearl edging', landmark: null, bonus: 'master-placevalue', art: 'art/lady-dress-18.svg' },
     { id: 19, era: 'edwardian', name: 'Ascot Gown', desc: 'White, black ribbons, wide-brim hat', landmark: null, bonus: 'master-fractions', art: 'art/lady-dress-19.svg' },
-    { id: 20, era: 'edwardian', name: 'Peacock Evening Gown', desc: 'Iridescent teal silk, beadwork', landmark: null, bonus: 'master-measures', art: 'art/lady-dress-20.svg' }
+    { id: 20, era: 'edwardian', name: 'Peacock Evening Gown', desc: 'Iridescent teal silk, beadwork', landmark: null, bonus: 'master-measures', art: 'art/lady-dress-20.svg' },
+    { id: 21, era: 'tudor', name: "Scholar's Gown", desc: 'Deep green wool, gold-embroidered numerals', landmark: null, bonus: 'master-column', art: 'art/lady-dress-21.svg' }
   ];
   var DRESS_BY_LANDMARK = { dover: [3, 4], tower: [5, 6], hampton: [7, 8],
     towerbridge: [9, 10], buckingham: [11, 12], ritz: [13, 14] };
@@ -87,6 +89,7 @@
   var DRESS_BY_ERA_BONUS = { edwardian: [15, 16] };
   /* Bonus dresses for mastery badges. */
   var DRESS_BY_MASTERY = {
+    'master-column': 21,
     'master-bonds': 17, 'master-placevalue': 18,
     'master-fractions': 19, 'master-measures': 20
   };
@@ -116,6 +119,7 @@
     { id: 'hot-streak', emoji: '🔥', name: 'Hot Streak', desc: 'Practised 3 days in a row' },
     { id: 'explorer', emoji: '🗺️', name: 'Tudor Explorer', desc: 'Unlocked all 3 Tudor landmarks' },
     { id: 'edwardian-explorer', emoji: '🚂', name: '1900s Explorer', desc: 'Completed 1900s London' },
+    { id: 'master-column', emoji: '🎓', name: 'Column Master', desc: 'Mastered Column Addition & Subtraction' },
     { id: 'master-bonds', emoji: '🥇', name: 'Bonds Master', desc: 'Mastered Number Bonds' },
     { id: 'master-placevalue', emoji: '🏆', name: 'Place Value Master', desc: 'Mastered Place Value' },
     { id: 'master-fractions', emoji: '🎖️', name: 'Fractions Master', desc: 'Mastered Fractions' },
@@ -124,6 +128,7 @@
 
   /* Mastery badges: one per topic, for sustained 90%+ accuracy. */
   var MASTERY = [
+    { topic: 'column', id: 'master-column', emoji: '🎓' },
     { topic: 'bonds', id: 'master-bonds', emoji: '🥇' },
     { topic: 'placevalue', id: 'master-placevalue', emoji: '🏆' },
     { topic: 'fractions', id: 'master-fractions', emoji: '🎖️' },

@@ -64,6 +64,7 @@
     topics: function () {
       /* Merge with defaults so older saves gain new topics (e.g. fractions). */
       var d = {
+        column: { level: 1, cc: 0, cw: 0 },
         bonds: { level: 1, cc: 0, cw: 0 },
         placevalue: { level: 1, cc: 0, cw: 0 },
         fractions: { level: 1, cc: 0, cw: 0 },

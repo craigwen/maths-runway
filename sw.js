@@ -1,5 +1,5 @@
 /* Maths Masters service worker. Relative scope: caches everything the app needs. */
-var CACHE = 'maths-masters-v24';
+var CACHE = 'maths-masters-v25';
 var FILES = [
   './',
   './index.html',
@@ -35,7 +35,8 @@ var FILES = [
   './art/lady-dress-17.svg',
   './art/lady-dress-18.svg',
   './art/lady-dress-19.svg',
-  './art/lady-dress-20.svg'
+  './art/lady-dress-20.svg',
+  './art/lady-dress-21.svg'
 ];
 
 self.addEventListener('install', function (event) {

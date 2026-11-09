@@ -129,6 +129,15 @@ h2 { font-size: 22px; margin: 22px 0 10px; }
 }
 
 .question { font-size: 28px; font-weight: 700; text-align: center; margin: 12px 0 6px; min-height: 72px; }
+
+/* Column sums: vertical layout with H/T/O headers, a rule, and ? marks
+   where the answer goes. Digits align in fixed-width columns. */
+.colsum { display: inline-block; font-size: 34px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.col-row { display: flex; justify-content: center; }
+.col-row span { width: 1.05em; text-align: center; }
+.col-head span { font-size: 15px; font-weight: 800; color: var(--gold); line-height: 1.1; }
+.col-line { border-bottom: 4px solid var(--ink); margin: 2px 0; }
+.col-ans span { color: var(--ink-soft); }
 .qnum {
   display: inline-block; background: var(--card); border: 3px solid var(--accent);
   border-radius: 14px; padding: 4px 16px; margin: 0 4px; min-width: 56px;
